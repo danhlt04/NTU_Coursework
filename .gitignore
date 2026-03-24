@@ -1,14 +1,97 @@
-*
+# =========================
+# OS (Windows / macOS / Linux)
+# =========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
-!*/
+# =========================
+# IDE / Editor (cross-platform)
+# =========================
+.vscode/
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.code-workspace
 
-!*.c
-!*.cpp
-!*.h
-!*.cs
+# =========================
+# Logs & temp files
+# =========================
+*.log
+*.tmp
+*.temp
+*.cache
 
-!*.sql
+# =========================
+# Environment 
+# =========================
+.env
+.env.*
 
-!.gitignore
-!*.md
+# =========================
+# C / C++
+# =========================
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.lib
 
+# =========================
+# C# / .NET
+# =========================
+bin/
+obj/
+Debug/
+Release/
+
+# =========================
+# Web (HTML, CSS, JS, Bootstrap)
+# =========================
+dist/
+build/
+
+# =========================
+# Node.js / React
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+venv/
+
+# =========================
+# R
+# =========================
+.Rhistory
+.RData
+.Rproj.user/
+
+# =========================
+# Database
+# =========================
+*.db
+*.sqlite
+
+# =========================
+# Test / coverage
+# =========================
+coverage/
+
+# =========================
+# Misc
+# =========================
+*.bak
+*.old
