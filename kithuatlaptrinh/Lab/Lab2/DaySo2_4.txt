@@ -1,2 +1,0 @@
-So luong phan tu mang : 3
-1.2 3.14 2.71 

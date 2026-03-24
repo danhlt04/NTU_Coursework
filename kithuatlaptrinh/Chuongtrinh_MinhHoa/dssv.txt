@@ -1,5 +1,0 @@
-62131234, Nguyen Van Hung, 8.75
-62134321, Truong Van Phi, 5.67
-62134554, Luu Van Bi, 7.89
-60131212, Tran Hoang Hieu, 7.23
-61133311, Vo Minh Hoang, 5.67

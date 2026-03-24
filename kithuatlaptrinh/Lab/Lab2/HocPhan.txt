@@ -1,7 +1,0 @@
-So luong hoc phan : 2
-SOT315
-Nhap mon lap trinh
-3
-SOT304
-Tin hoc so so
-2
