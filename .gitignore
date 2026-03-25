@@ -71,6 +71,9 @@ yarn-error.log*
 __pycache__/
 *.pyc
 venv/
+.venv/
+env/
+ENV/
 
 # =========================
 # R
@@ -102,3 +105,14 @@ coverage/
 *.bin
 *.dev
 *.win
+
+# =========================
+# Additional v2
+# =========================
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+id_rsa*
+id_dsa*
