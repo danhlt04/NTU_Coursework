@@ -10,15 +10,15 @@
 
 */
 
---Tao co so du lieu
+-- Tao co so du lieu
 
 CREATE DATABASE QLSV
 
---Bat dau dung co so du lieu
+-- Bat dau dung co so du lieu
 
 USE QLSV
 
---Tao bang
+-- Tao bang
 
 CREATE TABLE KHOA (
 	MaKhoa varchar(10) constraint pk_k_mk primary key,
@@ -62,7 +62,7 @@ CREATE TABLE KETQUA (
 	constraint pk_kq_msv_mkh primary key(MaSV, MaKhoaHoc)
 )
 
---Them du lieu
+-- Them du lieu
 
 INSERT INTO KHOA(MaKhoa, TenKhoa, SL_CBGD) 
 VALUES ('CNTT', N'Công nghệ thông tin', 15), 
@@ -76,12 +76,12 @@ VALUES ('SV001', 'BUI THUY AN', 'Nu', '223 TRAN HUNG DAO .HCM', '0843132202', 'C
 ('SV004', 'HOANG THI HOA','Nu', '90 NG VAN CU .HCM', '0988320123', 'CNTT'),
 ('SV005', 'TRAN HONG SON', 'Nam', '54 CAO THANG .HANOI', '0928345987', 'TOAN')
 
---Sua lai kieu du lieu cot GioiTinh
+-- Sua lai kieu du lieu cot GioiTinh
 
 ALTER TABLE SINHVIEN 
 ALTER COLUMN GioiTinh nvarchar(5)
 
---Cap nhat lai kieu du lieu cot GioiTinh
+-- Cap nhat lai kieu du lieu cot GioiTinh
 
 UPDATE SINHVIEN
 SET GioiTinh=N'Nữ'
@@ -122,7 +122,7 @@ Values ('SV001', 'K1', 8.5),
 ('SV005', 'K5', 7.0),
 ('SV004', 'K4', 2.0)
 
---Truy van SQL
+-- Truy van SQL
 
 SELECT * FROM KHOA
 SELECT * FROM SINHVIEN
@@ -131,47 +131,47 @@ SELECT * FROM MONHOC
 SELECT * FROM GIANGDAY
 SELECT * FROM KETQUA
 
---Câu 1: Liệt kê tên, địa chỉ, điện thoại của tất cả sinh viên
+-- Câu 1: Liệt kê tên, địa chỉ, điện thoại của tất cả sinh viên
 SELECT Ten, DiaChi, DienThoai 
 FROM SINHVIEN 
 
---Câu 2: Cho biết tên các môn học và số tín chỉ của từng môn
+-- Câu 2: Cho biết tên các môn học và số tín chỉ của từng môn
 SELECT TenMH, SoTC
 FROM MONHOC 
 
---Câu 3: Liệt kê kết quả học tập của sinh viên có Mã số "SV003"
+-- Câu 3: Liệt kê kết quả học tập của sinh viên có Mã số "SV003"
 SELECT * 
 FROM KETQUA
 WHERE MaSV = 'SV003'
 
---Câu 4: Cho biết tên các môn học có chứa chữ "DU" (VD: Cơ sở dữ liệu, Cấu trúc dữ liệu, ...)
+-- Câu 4: Cho biết tên các môn học có chứa chữ "DU" (VD: Cơ sở dữ liệu, Cấu trúc dữ liệu, ...)
 SELECT TenMH
 FROM MONHOC
 WHERE TenMH LIKE '%DU%'
 
---Câu 5: Liệt kê tên, địa chỉ của những sinh viên ở đường "Cống Quỳnh"
+-- Câu 5: Liệt kê tên, địa chỉ của những sinh viên ở đường "Cống Quỳnh"
 SELECT Ten, DiaChi 
 FROM SINHVIEN
 WHERE DiaChi LIKE '%CONG QUYNH%'
 
---Câu 6: Liệt kê danh sách các môn học được dạy trong năm 2020
+-- Câu 6: Liệt kê danh sách các môn học được dạy trong năm 2020
 SELECT * 
 FROM GIANGDAY
 WHERE Nam = 2020
 
---Câu 7: Cho biết mã, tên, địa chỉ các SV theo từng khoa, sắp theo thứ tự A-Z của tên SV
+-- Câu 7: Cho biết mã, tên, địa chỉ các SV theo từng khoa, sắp theo thứ tự A-Z của tên SV
 SELECT MSSV, Ten, GioiTinh, DiaChi
 FROM SINHVIEN 
 ORDER BY Ten 
 
---Câu 8: Liệt kê điểm của tất cả sinh viên theo từng môn học
+-- Câu 8: Liệt kê điểm của tất cả sinh viên theo từng môn học
 SELECT SINHVIEN.Ten, MONHOC.TenMH, KETQUA.Diem 
 FROM SINHVIEN
 JOIN KETQUA ON KETQUA.MaSV = SINHVIEN.MSSV
 JOIN GIANGDAY ON KETQUA.MaKhoaHoc = GIANGDAY.MaKhoaHoc
 JOIN MONHOC ON GIANGDAY.MaMH = MONHOC.MaMH
 
---Câu 9: Cho biết các sinh viên học môn 'CSDL' có điểm từ 8 đến 10
+-- Câu 9: Cho biết các sinh viên học môn 'CSDL' có điểm từ 8 đến 10
 SELECT SINHVIEN.MSSV, SINHVIEN.Ten
 FROM SINHVIEN
 JOIN KETQUA ON SINHVIEN.MSSV = KETQUA.MaSV
@@ -180,13 +180,13 @@ JOIN MONHOC ON GIANGDAY.MaMH = MONHOC.MaMH
 WHERE MONHOC.TenMH = 'CSDL'
 and Diem between 8 and 10
 
---Câu 10: Cho biết bảng điểm của sinh viên có tên là 'TÙNG'
+-- Câu 10: Cho biết bảng điểm của sinh viên có tên là 'TÙNG'
 SELECT *
 FROM KETQUA
 JOIN SINHVIEN ON KETQUA.MaSV = SINHVIEN.MSSV
 WHERE Ten LIKE '%TUNG%'
 
---Câu 11: Cho biết tên khoa, tên môn học mà sinh viên trong khoa đã học
+-- Câu 11: Cho biết tên khoa, tên môn học mà sinh viên trong khoa đã học
 SELECT KHOA.TenKhoa, MONHOC.TenMH
 FROM KHOA
 JOIN SINHVIEN ON KHOA.MaKhoa = SINHVIEN.MaKhoa
@@ -194,14 +194,14 @@ JOIN KETQUA ON SINHVIEN.MSSV = KETQUA.MaSV
 JOIN GIANGDAY ON KETQUA.MaKhoaHoc = GIANGDAY.MaKhoaHoc
 JOIN MONHOC ON GIANGDAY.MaMH = MONHOC.MaMH
 
---Câu 12: Liệt kê các giáo viên tham gia giảng dạy môn "Kỹ thuật lập trình"
+-- Câu 12: Liệt kê các giáo viên tham gia giảng dạy môn "Kỹ thuật lập trình"
 SELECT GIAOVIEN.MaGV, GIAOVIEN.TenGV
 FROM GIAOVIEN
 JOIN GIANGDAY ON GIAOVIEN.MaGV = GIANGDAY.MaGV
 JOIN MONHOC ON GIANGDAY.MaMH = MONHOC.MaMH
 WHERE TenMH = N'KY THUAT LAP TRINH'
 
---Câu 13: Cho biết môn học mà giáo viên "Trần Văn Tiến" giảng dạy trong học kỳ 1 năm 2020
+-- Câu 13: Cho biết môn học mà giáo viên "Trần Văn Tiến" giảng dạy trong học kỳ 1 năm 2020
 SELECT MONHOC.MaMH, MONHOC.TenMH, MONHOC.SoTC
 FROM MONHOC
 JOIN GIANGDAY ON MONHOC.MaMH = GIANGDAY.MaMH
@@ -210,7 +210,7 @@ WHERE TenGV = N'TRAN VAN TIEN'
 AND HocKy = 1
 AND Nam = 2020
 
---Câu 14: Liệt kê sinh viên đã học môn 'CSDL' và 'CTDL'
+-- Câu 14: Liệt kê sinh viên đã học môn 'CSDL' và 'CTDL'
 SELECT SINHVIEN.MSSV, SINHVIEN.Ten
 FROM SINHVIEN
 JOIN KETQUA ON SINHVIEN.MSSV = KETQUA.MaSV
@@ -220,31 +220,31 @@ WHERE MONHOC.MaMH IN ('CSDL','CTDL')
 GROUP BY SINHVIEN.MSSV, SINHVIEN.Ten
 HAVING COUNT(DISTINCT MONHOC.MaMH) = 2
 
---Câu 15: Cho biết mã, tên sinh viên có ít nhất một môn đạt điểm > 8
+-- Câu 15: Cho biết mã, tên sinh viên có ít nhất một môn đạt điểm > 8
 SELECT DISTINCT SINHVIEN.MSSV, SINHVIEN.Ten
 FROM SINHVIEN
 JOIN KETQUA ON SINHVIEN.MSSV = KETQUA.MaSV
 WHERE Diem > 8
 
---Câu 16: Cho biết nã, tên sinh viên có kết quả tất cả các môn đều trên 8 điểm 
+-- Câu 16: Cho biết nã, tên sinh viên có kết quả tất cả các môn đều trên 8 điểm 
 SELECT SINHVIEN.MSSV, SINHVIEN.Ten
 FROM SINHVIEN
 JOIN KETQUA ON SINHVIEN.MSSV = KETQUA.MaSV
 GROUP BY SINHVIEN.MSSV, SINHVIEN.Ten
 HAVING MIN(Diem) > 8
 
---Câu 17: Đếm số dinh viên nữ của khoa CNTT
+-- Câu 17: Đếm số dinh viên nữ của khoa CNTT
 SELECT COUNT(*) AS SoSVNu
 FROM SINHVIEN
 WHERE GioiTinh = N'Nữ'
 AND MaKhoa = 'CNTT'
 
---Câu 18: Cho biết số lượng môn học được giảng dạy trong học kỳ 1 năm 2021
+-- Câu 18: Cho biết số lượng môn học được giảng dạy trong học kỳ 1 năm 2021
 SELECT COUNT(DISTINCT MaMH) AS SoMon
 FROM GIANGDAY
 WHERE HocKy = 1 AND Nam = 2021
 
---Câu 19: Cho biết điểm trung bình của sinh viên có mã số 'SV004'
+-- Câu 19: Cho biết điểm trung bình của sinh viên có mã số 'SV004'
 SELECT MaSV, SUM(Diem * SoTC) / SUM(SoTC) AS DiemTrungBinh
 FROM KETQUA
 JOIN GIANGDAY ON GIANGDAY.MaKhoaHoc = KETQUA.MaKhoaHoc
@@ -252,14 +252,14 @@ JOIN MONHOC ON MONHOC.MaMH = GIANGDAY.MAMH
 WHERE MaSV = 'SV004'
 GROUP BY MaSV
 
---Câu 20: Liệt kê mã, tên, địa chỉ và điểm trung bình của từng sinh viên
+-- Câu 20: Liệt kê mã, tên, địa chỉ và điểm trung bình của từng sinh viên
 SELECT SINHVIEN.MSSV, SINHVIEN.Ten, SINHVIEN.DiaChi,
 AVG(KETQUA.Diem) AS DiemTrungBinh
 FROM SINHVIEN
 JOIN KETQUA ON SINHVIEN.MSSV = KETQUA.MaSV
 GROUP BY SINHVIEN.MSSV, SINHVIEN.Ten, SINHVIEN.DiaChi
 
---Câu 21: Cho biết số lượng điểm >= 8 của từng sinh viên
+-- Câu 21: Cho biết số lượng điểm >= 8 của từng sinh viên
 SELECT SINHVIEN.MSSV, COUNT(KETQUA.MaSV) as SoLuongDiemLonHon8
 FROM SINHVIEN
 LEFT JOIN KETQUA 
@@ -267,20 +267,20 @@ ON KETQUA.MaSV = SINHVIEN.MSSV
 AND KETQUA.Diem >= 8
 GROUP BY SINHVIEN.MSSV 
 
---Câu 22: Cho biết tên khoa, số lượng sinh viên theo học
+-- Câu 22: Cho biết tên khoa, số lượng sinh viên theo học
 SELECT KHOA.TenKhoa, COUNT(SINHVIEN.MSSV) as SoLuongSinhVien
 FROM KHOA
 JOIN SINHVIEN ON SINHVIEN.MaKhoa = KHOA.MaKhoa
 GROUP BY TenKhoa
 
---Câu 23: Cho biết tên khoa, số lượng khóa học mà giảng viên của khoa đã giảng dạy
+-- Câu 23: Cho biết tên khoa, số lượng khóa học mà giảng viên của khoa đã giảng dạy
 SELECT TenKhoa, COUNT(MaKhoaHoc) as SoLuongKhoaHoc
 FROM KHOA
 JOIN GIAOVIEN ON GIAOVIEN.MaKhoa = KHOA.MaKhoa
 JOIN GIANGDAY ON GIANGDAY.MaGV = GIAOVIEN.MaGV
 GROUP BY TenKhoa
 
---Câu 24: Liệt kê tên sinh viên, điểm trung bình và số môn đã tham gia
+-- Câu 24: Liệt kê tên sinh viên, điểm trung bình và số môn đã tham gia
 SELECT SINHVIEN.Ten, SUM(KETQUA.Diem * SoTC) / SUM(SoTC) as DiemTrungBinh, COUNT(KETQUA.MaKhoaHoc) as SoLuongMon
 FROM SINHVIEN 
 JOIN KETQUA ON KETQUA.MaSV = SINHVIEN.MSSV
@@ -288,7 +288,7 @@ JOIN GIANGDAY ON GIANGDAY.MaKhoaHoc = KETQUA.MaKhoaHoc
 JOIN MONHOC ON MONHOC.MaMH = GIANGDAY.MAMH
 GROUP BY SINHVIEN.Ten
 
---Câu 25: Cho biết số lượng tín chỉ mà từng sinh viên đã tham gia
+-- Câu 25: Cho biết số lượng tín chỉ mà từng sinh viên đã tham gia
 SELECT SINHVIEN.MSSV, SUM(MONHOC.SoTC) as SoTinChi
 FROM SINHVIEN 
 JOIN KETQUA ON KETQUA.MaSV = SINHVIEN.MSSV
@@ -296,14 +296,14 @@ JOIN GIANGDAY ON GIANGDAY.MaKhoaHoc = KETQUA.MaKhoaHoc
 JOIN MONHOC ON MONHOC.MaMH = GIANGDAY.MaMH
 GROUP BY SINHVIEN.MSSV 
 
---Câu 26: Liệt kê tên sinh viên chỉ mới thi đúng 1 môn
+-- Câu 26: Liệt kê tên sinh viên chỉ mới thi đúng 1 môn
 SELECT SINHVIEN.MSSV, COUNT(KETQUA.Diem) as SoLuongMonDaThi
 FROM SINHVIEN
 JOIN KETQUA ON KETQUA.MaSV = SINHVIEN.MSSV
 GROUP BY SINHVIEN.MSSV
 HAVING COUNT(KETQUA.Diem) = 1
 
---Câu 27: Cho biết sinh viên có điểm trung bình > 8.5
+-- Câu 27: Cho biết sinh viên có điểm trung bình > 8.5
 SELECT MaSV, SUM(Diem * SoTC) / SUM(SoTC) as DiemTrungBinh
 FROM KETQUA 
 JOIN GIANGDAY ON GIANGDAY.MaKhoaHoc = KETQUA.MaKhoaHoc
@@ -311,17 +311,17 @@ JOIN MONHOC ON MONHOC.MaMH = GIANGDAY.MaMH
 GROUP BY MaSV
 HAVING SUM(Diem * SoTC) / SUM(SoTC) > 8.5
 
---Câu 28: Cho biết các khóa học có số lượng sinh viên tham gia từ 2 đến 4
+-- Câu 28: Cho biết các khóa học có số lượng sinh viên tham gia từ 2 đến 4
 SELECT MaKhoaHoc, COUNT(MaSV) as SoLuongSinhVien
 FROM KETQUA
 GROUP BY MaKhoaHoc
 HAVING COUNT(MaSV) between 2 and 4
 
---Câu 29: Điểm cao nhất mà sinh viên đã đạt được trong tất cả các môn
+-- Câu 29: Điểm cao nhất mà sinh viên đã đạt được trong tất cả các môn
 SELECT MAX(Diem) as DiemCaoNhat
 FROM KETQUA
 
---Câu 30: Cho biết tên môn học có nhiều sinh viên tham gia nhất 
+-- Câu 30: Cho biết tên môn học có nhiều sinh viên tham gia nhất 
 SELECT TOP 1 WITH TIES MONHOC.MaMH, COUNT(SINHVIEN.MSSV) as SoLuongSinhVien
 FROM MONHOC 
 JOIN GIANGDAY ON GIANGDAY.MaMH = MONHOC.MaMH
@@ -330,7 +330,7 @@ JOIN SINHVIEN ON SINHVIEN.MSSV = KETQUA.MaSV
 GROUP BY MONHOC.MaMH
 ORDER BY SoLuongSinhVien DESC
 
---Câu 31: Với mỗi môn học, liệt kê tên và điểm của sinh viên có điểm cao nhất
+-- Câu 31: Với mỗi môn học, liệt kê tên và điểm của sinh viên có điểm cao nhất
 SELECT MONHOC.MaMH, SINHVIEN.Ten, MAX(KETQUA.Diem) as DiemCaoNhat
 FROM SINHVIEN 
 JOIN KETQUA ON KETQUA.MaSV = SINHVIEN.MSSV
@@ -351,29 +351,29 @@ WHERE KQ1.DIEM = (
 	WHERE GD1.MaMH = GD2.MaMH
 )
 
---Câu 32: Học kỳ nào có nhiều môn học được giảng dạy nhất
+-- Câu 32: Học kỳ nào có nhiều môn học được giảng dạy nhất
 SELECT TOP 1 WITH TIES HocKy, COUNT(MaMH) SoLuongMon
 FROM GIANGDAY 
 GROUP BY HocKy
 ORDER BY SoLuongMon DESC
 
---Câu 33: Cho biết tên sinh viên có nhiều điểm 7 nhất
+-- Câu 33: Cho biết tên sinh viên có nhiều điểm 7 nhất
 
---Câu 34: Cho biết tên sinh viên có số tín chỉ nhiều nhất
+-- Câu 34: Cho biết tên sinh viên có số tín chỉ nhiều nhất
 
---Câu 35: Cho biết môn học có số tín chỉ lớn nhất và nhỏ nhất
+-- Câu 35: Cho biết môn học có số tín chỉ lớn nhất và nhỏ nhất
 
---Câu 36: Liệt kê tên giáo viên tham gia giảng dạy nhiều nhất
+-- Câu 36: Liệt kê tên giáo viên tham gia giảng dạy nhiều nhất
 
---Câu 37: Liệt kê các môn học chưa được tổ chức
+-- Câu 37: Liệt kê các môn học chưa được tổ chức
 
---Câu 38: Cho biết sinh viên đã học tất cả các môn học
+-- Câu 38: Cho biết sinh viên đã học tất cả các môn học
 
---Câu 39: Cho biết giáo viên giảng dạy tất cả các môn mà giáo viên 'GV03' đã dạy
+-- Câu 39: Cho biết giáo viên giảng dạy tất cả các môn mà giáo viên 'GV03' đã dạy
 
---Câu 40: Cho biết sinh viên đã học tất cả các môn mà sinh viên 'SV001' đã học
+-- Câu 40: Cho biết sinh viên đã học tất cả các môn mà sinh viên 'SV001' đã học
 
---Câu 41: Thêm các field SLMon (số lượng môn), DTB (điểm trung bình), XL (xếp loại) vào bảng SinhVien
+-- Câu 41: Thêm các field SLMon (số lượng môn), DTB (điểm trung bình), XL (xếp loại) vào bảng SinhVien
 
 /*
 Câu 42: Cập nhật thông tin cho các field vừa tạo:
@@ -382,8 +382,8 @@ Câu 42: Cập nhật thông tin cho các field vừa tạo:
 	XL: xếp loại theo thang (Yếu, Trung bình, Khá, Giỏi, Xuất sắc)
 */
 
---Câu 43: Xóa toàn bộ kết quả học tập của sinh viên 'SV002'
+-- Câu 43: Xóa toàn bộ kết quả học tập của sinh viên 'SV002'
 
---Câu 44: Xóa các sinh viên có điểm trung bình < 5
+-- Câu 44: Xóa các sinh viên có điểm trung bình < 5
 
---Câu 45: Xóa những khoa không có sinh viên theo học
+-- Câu 45: Xóa những khoa không có sinh viên theo học

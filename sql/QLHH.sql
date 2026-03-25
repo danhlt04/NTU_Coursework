@@ -10,9 +10,15 @@
 
 */
 
+-- Tao database
+
 CREATE DATABASE QLHH
 
+-- Su dung database
+
 USE QLHH
+
+-- Tao cac bang va khoa chinh
 
 CREATE TABLE KHACHHANG (
 	MAKHACHHANG varchar(10),
@@ -86,12 +92,16 @@ CREATE TABLE CTDATHANG (
 	constraint pk_ct_shd_mh primary key(SOHOADON, MAHANG)
 )
 
+-- Them cac khoa ngoai
+
 ALTER TABLE MATHANG add constraint fk_mh_mlh foreign key(MALOAIHANG) references LOAIHANG(MALOAIHANG)
 ALTER TABLE MATHANG add constraint fk_mh_mct foreign key(MACONGTY) references NHACUNGCAP(MACONGTY)
 ALTER TABLE DONDATHANG add constraint fk_ddh_mkh foreign key(MAKHACHHANG) references KHACHHANG(MAKHACHHANG)	
 ALTER TABLE DONDATHANG add constraint fk_ddh_mnv foreign key(MANHANVIEN) references NHANVIEN(MANHANVIEN)
 ALTER TABLE CTDATHANG add constraint fk_ct_mah foreign key(MAHANG) references MATHANG(MAHANG)
 ALTER TABLE CTDATHANG add constraint fk_ct_shd foreign key(SOHOADON) references DONDATHANG(SOHOADON)
+
+-- Them du lieu
 
 INSERT INTO KHACHHANG(MAKHACHHANG, TENCONGTY, TENGIAODICH, DIACHI, EMAIL, DIENTHOAI, FAX) 
 VALUES 
@@ -194,17 +204,101 @@ VALUES
 ('HD10', 'MH10',  185000, 3, 0.05),
 ('HD10', 'MH07', 2550000, 2, 0.06)
 
---1. Cho biết danh sách các đối tác cung cấp hàng cho công ty
+-- Bai tap truy van
+
+-- 1. Cho biết danh sách các đối tác cung cấp hàng cho công ty
 SELECT * 
 FROM NHACUNGCAP
 
---2. Cho biết mã hàng, tên hàng và số lượng của các mặt hàng hiện có trong công ty
-SELECT MAHANG, TENHANG, COUNT(MAHANG)  as SoLuongMatHang
+-- 2. Cho biết mã hàng, tên hàng và số lượng của các mặt hàng hiện có trong công ty
+SELECT MAHANG, TENHANG, SOLUONG
 FROM MATHANG 
-JOIN LOAIHANG 
-ON MATHANG.MAHANG = LOAIHANG.MALOAIHANG
-GROUP BY LOAIHANG.MALOAIHANG 
 
---3. Cho biết họ tên và địa chỉ và năm bắt đầu làm việc của các nhân viên trong công ty
+-- 3. Cho biết họ tên và địa chỉ và năm bắt đầu làm việc của các nhân viên trong công ty
+SELECT HO, TEN, DIACHI, NGAYLAMVIEC
+FROM NHANVIEN
+
+-- 4. Cho biết địa chỉ và điện thoại của nhà cung cấp có tên giao dịch VINAMILK là gì
+SELECT DIACHI, DIENTHOAI
+FROM NHACUNGCAP
+WHERE TENGIAODICH = 'VINAMILK'
+
+-- 5. Cho biết mã và tên của các mặt hàng có giá > 100000 và số lượng hiện có ít hơn 50
+SELECT MAHANG, TENHANG
+FROM MATHANG
+WHERE GIAHANG > 100000 AND SOLUONG < 50
+
+-- 6. Công ty Việt Tiến đã cung cấp những mặt hàng nào
+SELECT TENLOAIHANG
+FROM NHACUNGCAP
+JOIN MATHANG ON NHACUNGCAP.MACONGTY = MATHANG.MACONGTY
+JOIN LOAIHANG ON LOAIHANG.MALOAIHANG = MATHANG.MALOAIHANG
+WHERE TENCONGTY LIKE N'%Việt Tiến%'
+
+-- 7. Loại hàng thực phẩm do các công ty nào cung cấp và địa chỉ của các công ty đó là gì
+SELECT TENCONGTY, DIACHI
+FROM NHACUNGCAP
+JOIN MATHANG ON NHACUNGCAP.MACONGTY = MATHANG.MACONGTY
+JOIN LOAIHANG ON MATHANG.MALOAIHANG = LOAIHANG.MALOAIHANG
+WHERE TENLOAIHANG = N'thực phẩm' 
+
+-- 8. Những khách hàng nào (tên giao dịch) đã đặt mua mặt hàng Sữa hộp XYZ
+SELECT TENGIAODICH
+FROM KHACHHANG
+JOIN DONDATHANG ON KHACHHANG.MAKHACHHANG = DONDATHANG.MAKHACHHANG
+JOIN CTDATHANG ON DONDATHANG.SOHOADON = CTDATHANG.SOHOADON
+JOIN MATHANG ON CTDATHANG.MAHANG = MATHANG.MAHANG
+WHERE TENHANG = N'Sữa hộp XYZ'
+
+-- 9. Cho biết đơn đặt hàng số 1 do ai đặt và do nhân viên nào lập, thời gian và địa điểm giao hàng là ở đâu
+SELECT MAKHACHHANG, MANHANVIEN, NGAYGIAOHANG, NOIGIAOHANG
+FROM DONDATHANG
+WHERE SOHOADON = 'HD01'
+
+-- 10. Cho biết số tiền lương mà công ty phải trả cho mỗi nhân viên là bao nhiêu (lương = lương cơ bản + phụ cấp)
+SELECT MANHANVIEN, LUONGCOBAN + PHUCAP AS LUONG
+FROM NHANVIEN
+
+-- 11. Cho biết đơn đặt hàng số 3 đã đặt mua những mặt hàng nào và số tiền mà khách hàng phải trả cho mỗi mặt hàng là bao nhiêu (TIENPHAITRA = SOLUONG X GIABAN - SOLUONG X GIABAN X MUCGIAMGIA / 100)
+SELECT CTDATHANG.MAHANG, TENLOAIHANG, CTDATHANG.SOLUONG * GIABAN - CTDATHANG.SOLUONG * GIABAN * MUCGIAMGIA / 100 AS TIENPHAITRA
+FROM CTDATHANG
+JOIN MATHANG ON CTDATHANG.MAHANG = MATHANG.MAHANG
+JOIN LOAIHANG ON MATHANG.MALOAIHANG = LOAIHANG.MALOAIHANG
+WHERE SOHOADON = 'HD03'
+
+-- 12. Hãy cho biết những khách hàng nào lại chính là đối tác cung cấp hàng cho công ty (tức là có cùng tên giao dịch)
+SELECT *
+FROM KHACHHANG
+JOIN DONDATHANG ON KHACHHANG.MAKHACHHANG = DONDATHANG.MAKHACHHANG
+JOIN CTDATHANG ON DONDATHANG.SOHOADON = DONDATHANG.SOHOADON
+JOIN MATHANG ON CTDATHANG.MAHANG = MATHANG.MAHANG
+JOIN NHACUNGCAP ON MATHANG.MACONGTY = NHACUNGCAP.MACONGTY
+WHERE KHACHHANG.TENGIAODICH = NHACUNGCAP.TENGIAODICH
+
+-- 13. Trong công ty có những nhân viên nào có cùng ngày sinh
+
+-- 14. Những đơn đặt hàng nào yêu cầu giao hàng ngay tại công ty đặt hàng và những đơn đó là của công ty nào
+
+-- 15. Cho biết tên công ty, tên giao dịch, địa chỉ và điện thoại của các khách hàng và các nhà cung cấp hàng cho công ty
+SELECT TENCONGTY, TENGIAODICH, DIACHI, DIENTHOAI
+FROM KHACHHANG
+UNION
+SELECT TENCONGTY, TENGIAODICH, DIACHI, DIENTHOAI
+FROM NHACUNGCAP
 
 
+-- 16. Những mặt hàng nào chưa từng được khách hàng mua
+SELECT MAHANG
+FROM MATHANG
+EXCEPT 
+SELECT MAHANG
+FROM CTDATHANG
+
+-- 17. Những nhân viên nào của công ty chưa từng lập bất kỳ một hóa đơn đặt hàng nào 
+
+
+-- 18. Những nhân viên nào của công ty có lương cơ bản cao nhất 
+
+-- 19. Tổng số tiền mà khách hàng phải trả cho mỗi đơn đặt hàng là bao nhiêu
+
+-- 20. Trong năm 2021, những mặt hàng nào chỉ được đặt mua đúng một lần
