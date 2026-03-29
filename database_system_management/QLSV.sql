@@ -14,7 +14,7 @@
 
 CREATE DATABASE QLSV
 
--- Bat dau dung co so du lieu
+-- Su dung co so du lieu
 
 USE QLSV
 
@@ -122,7 +122,7 @@ Values ('SV001', 'K1', 8.5),
 ('SV005', 'K5', 7.0),
 ('SV004', 'K4', 2.0)
 
--- Truy van SQL
+-- Kiem tra du lieu da nhap
 
 SELECT * FROM KHOA
 SELECT * FROM SINHVIEN
@@ -130,6 +130,8 @@ SELECT * FROM GIAOVIEN
 SELECT * FROM MONHOC
 SELECT * FROM GIANGDAY
 SELECT * FROM KETQUA
+
+-- Bai tap Chuong 4
 
 -- Câu 1: Liệt kê tên, địa chỉ, điện thoại của tất cả sinh viên
 SELECT Ten, DiaChi, DienThoai 

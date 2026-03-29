@@ -10,6 +10,7 @@
 
 */
 
+
 CREATE DATABASE QLDA
 
 USE QLDA
@@ -64,14 +65,6 @@ CREATE TABLE PHONGBAN (
 	NG_NHANCHUC date,
 	constraint pk_pb_mpb primary key(MAPB)
 )
-
-ALTER TABLE THANNHAN add constraint fk_tn_mnv foreign key(MANV) references NHANVIEN(MANV)
-ALTER TABLE PHANCONG add constraint fk_pc_mnv foreign key(MANV) references NHANVIEN(MANV)
-ALTER TABLE PHANCONG add constraint fk_pc_mda foreign key(MADA) references DEAN(MADA)
-ALTER TABLE DEAN add constraint fk_da_mpb foreign key(MAPB) references PHONGBAN(MAPB)
-ALTER TABLE DDIEMPB add constraint fk_ddpb_mpb foreign key(MAPB) references PHONGBAN(MAPB)
-ALTER TABLE PHONGBAN add constraint fk_pb_tp foreign key(TRUONGPHONG) references NHANVIEN(MANV)
---ALTER TABLE NHANVIEN add constraint fk_nv_mpb foreign key(MAPB) references PHONGBAN(MAPB)--
 
 INSERT INTO NHANVIEN(MANV, HONV, TENLOT, TENNV, NGAYSINH, DIACHI, PHAI, LUONG, MAPB)
 VALUES 
@@ -137,35 +130,103 @@ VALUES
 ('NV7', N'LE THI NGAN', 'NU', '1980-06-07', N'EM GÁI'),
 ('NV9', N'TRAN QUOC VUONG', 'NAM', '1975-05-05', N'CHỒNG')
 
---Query--
+ALTER TABLE THANNHAN add constraint fk_tn_mnv foreign key(MANV) references NHANVIEN(MANV)
+ALTER TABLE PHANCONG add constraint fk_pc_mnv foreign key(MANV) references NHANVIEN(MANV)
+ALTER TABLE PHANCONG add constraint fk_pc_mda foreign key(MADA) references DEAN(MADA)
+ALTER TABLE DEAN add constraint fk_da_mpb foreign key(MAPB) references PHONGBAN(MAPB)
+ALTER TABLE DDIEMPB add constraint fk_ddpb_mpb foreign key(MAPB) references PHONGBAN(MAPB)
+ALTER TABLE PHONGBAN add constraint fk_pb_tp foreign key(TRUONGPHONG) references NHANVIEN(MANV)
+ALTER TABLE NHANVIEN add constraint fk_nv_mpb foreign key(MAPB) references PHONGBAN(MAPB)
 
-1. Cho biết tên, tuổi của từng nhân viên 
+-- Bai tap chuong 4
 
-2. Cho biết thông tin về những người có phái là nam và địa chỉ trên đường "Tran Hung Dao"
+-- 1.Cho biết tên, tuổi của từng nhân viên 
+SELECT HONV, TENLOT, TENNV, YEAR(GETDATE()) - YEAR(NGAYSINH) AS TUOI
+FROM NHANVIEN
 
-3. Cho biết những người có học là "Le" và tên bắt đầu bằng ký tự "N"
+-- 2.Cho biết thông tin về những người có phái là nam và địa chỉ trên đường "Tran Hung Dao"
+SELECT *
+FROM NHANVIEN
+WHERE PHAI = 'NAM' AND DIACHI LIKE N'%Tran Hung Dao%'
 
-4. Cho biết những người có ngày sinh trong tháng 7 năm 1978
+-- 3.Cho biết những người có họ là "Le" và tên bắt đầu bằng ký tự "N"
+SELECT *
+FROM NHANVIEN 
+WHERE HONV = N'LE' AND TENNV LIKE N'N%'
 
-5. Cho biết những người có ngày sinh trong quý 3
+-- 4.Cho biết những người có ngày sinh trong tháng 7 năm 1978
+SELECT *
+FROM NHANVIEN 
+WHERE NGAYSINH >= '1978/07/01' AND NGAYSINH <= '1978/07/31'
 
-6. Cho biết số đề án được phân công của từng nhân viên (gồm mã số, tên, số lượng đề án được phân công)
+SELECT *
+FROM NHANVIEN 
+WHERE YEAR(NGAYSINH) = 1978 AND MONTH(NGAYSINH) = 7
 
-7. Cho biết tên nhân viên có từ 2 thân nhân trở lên
+-- 5.Cho biết những người có ngày sinh trong quý 3
+SELECT * 
+FROM NHANVIEN
+WHERE MONTH(NGAYSINH) BETWEEN 7 AND 9
 
-8. Tên nhân viên >= 30 tuổi được phân công làm việc cho đề án ở TPHCM
+-- 6.Cho biết số đề án được phân công của từng nhân viên (gồm mã số, tên, số lượng đề án được phân công)
+SELECT NHANVIEN.MANV, COUNT(MADA) SLDA
+FROM PHANCONG
+JOIN NHANVIEN ON NHANVIEN.MANV = PHANCONG.MANV
+GROUP BY NHANVIEN.MANV
 
-9. Cho biết có bao nhiêu đề án ở TPHCM
+-- 7.Cho biết tên nhân viên có từ 2 thân nhân trở lên
+SELECT NHANVIEN.MANV, TENNV, COUNT(NHANVIEN.MANV) AS SLTN
+FROM NHANVIEN
+JOIN THANNHAN ON NHANVIEN.MANV = THANNHAN.MANV
+GROUP BY NHANVIEN.MANV, TENNV
+HAVING COUNT(NHANVIEN.MANV) >= 2
 
-10. Đối với mỗi thành phố, cho biết tên và số lượng đề án được thực hiện ờ đó
+-- 8.Tên nhân viên >= 30 tuổi được phân công làm việc cho đề án ở TPHCM
+SELECT NHANVIEN.MANV, TENNV
+FROM NHANVIEN
+JOIN PHANCONG ON NHANVIEN.MANV = PHANCONG.MANV
+JOIN DEAN ON PHANCONG.MADA = DEAN.MADA
+WHERE YEAR(GETDATE()) - YEAR(NGAYSINH) >= 30 AND DDIEM_DA = 'TPHCM'
 
-11. Cho biết số năm thâm niên (số năm làm việc) của từng trường phòng
+-- 9.Cho biết có bao nhiêu đề án ở TPHCM
+SELECT COUNT(MADA) AS SLDA
+FROM DEAN
+WHERE DDIEM_DA = 'TPHCM'
 
-12. Cho biết số lượng địa điểm của từng phòng ban 
+-- 10.Đối với mỗi thành phố, cho biết tên và số lượng đề án được thực hiện ờ đó
+SELECT DDIEM_DA, COUNT(MADA) AS SLDA
+FROM DEAN
+GROUP BY DDIEM_DA
 
-13. Cho biết có bao nhiêu tên đề án là "sản phẩm"
+-- 11.Cho biết số năm thâm niên (số năm làm việc) của từng trưởng phòng
+SELECT PB.TENPB, NV.TENNV,
+       YEAR(GETDATE()) - YEAR(PB.NG_NHANCHUC) AS THAMNIEN
+FROM PHONGBAN PB
+JOIN NHANVIEN NV ON PB.TRUONGPHONG = NV.MANV
 
-14. Cho biết tên phòng, địa điểm phòng, tên đề án, địa điểm đề án của những đề án có địa điểm của đề án trùng với địa điểm của phòng
+-- 12.Cho biết số lượng địa điểm của từng phòng ban 
+SELECT MAPB, COUNT(DIADIEM) AS SLDD
+FROM DDIEMPB
+GROUP BY MAPB
 
-15. Tên các nhân viên quản lý có mức lương thấp hơn lương trung bình nhân viên họ quản lí trực tiếp 
+-- 13.Cho biết có bao nhiêu tên đề án là "sản phẩm"
+SELECT COUNT(*) SLSP
+FROM DEAN
+WHERE TENDA LIKE N'San pham%'
 
+-- 14.Cho biết tên phòng, địa điểm phòng, tên đề án, địa điểm đề án của những đề án có địa điểm của đề án trùng với địa điểm của phòng
+SELECT TENPB, DIADIEM, TENDA, DDIEM_DA
+FROM PHONGBAN 
+JOIN DEAN ON PHONGBAN.MAPB = DEAN.MAPB
+JOIN DDIEMPB ON PHONGBAN.MAPB = DDIEMPB.MAPB
+WHERE DIADIEM = DDIEM_DA
+
+-- 15.Tên các nhân viên quản lý có mức lương thấp hơn lương trung bình nhân viên họ quản lí trực tiếp 
+SELECT NV.MANV, NV.TENNV, NV.LUONG
+FROM NHANVIEN NV
+JOIN PHONGBAN PB ON NV.MANV = PB.TRUONGPHONG
+WHERE NV.LUONG < (
+    SELECT AVG(LUONG)
+    FROM NHANVIEN
+    WHERE MAPB = PB.MAPB
+)
