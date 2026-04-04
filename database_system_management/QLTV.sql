@@ -194,6 +194,44 @@ INSERT INTO QuaTrinhMuon (ISBN, Ma_CuonSach, NgayMuon, Ma_DocGia, NgayHetHan, Ng
 ('978-604-5', 'CS005', '2024-03-01', 'DG004', '2024-03-15', '2024-03-15', 8.00, 8.00, 80.00, N'Sách ngoại văn');
 
 
+-- 1. Có bao nhiêu phiếu mượn sách thư viện trong năm qua?
+-- 2. Cho biết danh sách số ngày mượn sách của các lần đã mượn sách?
+-- 3. Cho biết danh sách số ngày mượn sách trung bình của các lần đã mượn sách?
+-- 4. Cho biết danh sách những phiếu mượn trả sách quá hạn?
+-- 5. Cho biết danh sách (độc giả, sách được mượn) những độc giả đã được mượn quá hạn?
+-- 6. Cho biết danh sách (độc giả, sách được mượn) những độc giả đã và đang được mượn quá han?
+-- 7. Số lượng sách nhiều nhất mà một người đã mượn?
+-- 8. Bạn dọc mượn sách nhiều nhắt là ngày nào? 
+-- 9. Tính tống số tiền mượn đã trả trong quá trình mượn sách
+-- 10. Tìm số cuốn sách có tình trạng "Hỏng"
+-- 11. Tính số cuốn sách trung bình mỗi độc giả đã mượn
+-- 12. Tìm số lượng sách của từng tác giả
+-- 13. Tìm các tác giả có hơn 5 đầu sách trong thư viện
+-- 14. Tìm các độc giả đã mượn hơn 3 cuốn sách
+-- 15. Tìm các đầu sách có hơn 2 cuốn sách bị hỏng
+-- 16. Tìm độc giả đã đăng ký mượn hơn 2 cuốn sách
+-- 17. Tìm các ngày có hơn 3 lượt mượn sách
+-- 18. Tìm độc giả trẻ nhất
+-- 19. Tìm đầu sách có số lượng sách ít nhất
+-- 20. Tìm độc giả chưa từng mượn sách
+-- 21. Tìm sách chưa được ai đăng ký mượn
+-- 22. Tìm độc giả đã mượn nhưng chưa trả sách
+-- 23. Lấy danh sách tất cả độc giả cả người lớn và trẻ em
+-- 24. Lấy danh sách độc gỉa vừa đăng ký vừa mượn sách
+-- 25. Lấy danh sách độc giả chỉ đăng ký nhưng chưa mượn sách
+-- 26. Cập nhật tình trạng sách bị hỏng thành "Đang sửa"
+-- 28. Xóa tất cá độc giả chưa từng mượn sách
+-- 27. Gia hạn thêm 1 năm cho tất cả độc giả người lớn
+-- 30. Xóa tất cả sách đã bị hỏng
+-- 29. Cập nhật số điện thoại của độc giả có mã số là 5 thành 0909123456
+-- 31. Tìm độc giả đã mượn tất cả các đầu sách
+-- 32. Tìm độc giả đã đăng ký mượn tất cả các đầu sách
+-- 33. Liệt kê top 5 bạn dọc mượn sách nhiều nhất trong năm 2024
+-- 34. Liệt kê thể loại sách được mượn nhiều nhất trong quý 1 năm 2025
+-- 35. Tìm bạn đọc trả sách trễ nhiều lần nhất (Tính số lần NgayTra > HanTra cho từng bạn đọc, lọc ra top đầu COUNT(CASE WHEN ... THEN 1 END))
+-- 36.Tìm những bạn dọc mượn đù tất cá sách cùa tác giả "Nguyễn Nhật Ánh"
+-- 37.Danh sách bạn đọc chưa mượn quyển sách nào kể từ khi đăng ký
+
 /*
 Bài tập chương 6
 Bài 4.
