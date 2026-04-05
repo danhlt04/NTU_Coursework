@@ -122,15 +122,6 @@ Values ('SV001', 'K1', 8.5),
 ('SV005', 'K5', 7.0),
 ('SV004', 'K4', 2.0)
 
--- Kiem tra du lieu da nhap
-
-SELECT * FROM KHOA
-SELECT * FROM SINHVIEN
-SELECT * FROM GIAOVIEN
-SELECT * FROM MONHOC
-SELECT * FROM GIANGDAY
-SELECT * FROM KETQUA
-
 -- Bai tap Chuong 4
 
 -- Câu 1: Liệt kê tên, địa chỉ, điện thoại của tất cả sinh viên
@@ -353,20 +344,6 @@ GROUP BY HocKy
 ORDER BY SoLuongMon DESC
 
 -- Câu 33: Cho biết tên sinh viên có nhiều điểm 7 nhất
-SELECT SV.MSSV, SV.Ten
-FROM SINHVIEN SV
-WHERE NOT EXISTS (
-	SELECT * 
-	FROM MONHOC MH
-	WHERE NOT EXISTS (
-		SELECT * 
-		FROM GIANGDAY GD
-		JOIN KETQUA KQ ON KQ.MaKhoaHoc = GD.MaKhoaHoc
-		WHERE GD.MaMH = MH.MaMH
-		AND KQ.MaSV = SV.MSSV
-	)
-)
-
 SELECT TOP 1 WITH TIES MaSV
 FROM KETQUA
 WHERE Diem = 7
@@ -374,14 +351,6 @@ GROUP BY MaSV
 ORDER BY COUNT(*) DESC
 
 -- Câu 34: Cho biết tên sinh viên có số tín chỉ nhiều nhất
-SELECT SV.MSSV, SV.Ten
-FROM SINHVIEN SV
-WHERE NOT EXISTS (
-    SELECT *
-    FROM KETQUA KQ
-    WHERE KQ.MaSV = SV.MSSV
-)
-
 SELECT TOP 1 WITH TIES SV.MSSV, SV.Ten
 FROM SINHVIEN SV
 JOIN KETQUA KQ ON SV.MSSV = KQ.MaSV

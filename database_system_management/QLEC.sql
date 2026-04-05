@@ -352,3 +352,22 @@ ON VANCHUYEN.MaDiaChi = DIACHI.MaDiaChi
 
 --26. Với mỗi khách hàng, gộp danh sách mã đơn bằng STRING_AGG(MaDon, ',')
 
+--27. Liệt kê đơn hoàn tắt (TrangThai='HIOAN _TẠT) nhưng chưa có vận dơn (không có bản ghi trong VANCHUYEN). 
+28. Tính số ngày giao hàng = (thời điểm DA GIÃO mới nhất ~ NgayDat) cho các đơn đà giao trong 90 ngày gân đây.
+29. Thống kê doanh thu theo tháng trong năm 2025 
+30. Liệt kê Top 3 danh mục có doanh thu cao nhất trong quý 2/2025 
+31. Tìm tập khách hàng đóng góp 80% doanh thu năm 2025, kèm % tích lãy. (Gợi ý SUM TongTlien) GROUP BY MaKI, ding SUM OVER (ORDER BY DoanhThu DESC) để tính % tích lũy)
+(cột: Thang. Doanh Thu).
+32. Liệt kê cặp (SP_A, SP. B) cùng xuất hiện trong 210 đơn trong 6 tháng gần đây. (Gợi Self-join CTDONDATHANG theo MaDon, HAVING COUNT(*) >= 10) 
+33. Liệt kê sản phẩm tồn kho >0 nhưng không bán trong 90 ngày gần nhất. (Gợi ý: NOT EXISTS với CTDONDATHANG 1ọc NgayDat DATEADDODAY. 90,GETDATEO) 
+34. Với mỗi sản phầm, S tính % chênh lệch) sánh giá niêm yết (Gia) và giá bán thưc tế TB (sau chiết khẩu)
+(Gợi : AVG(DonGia*(1-ChietKhau/100), 
+35. Tính tổng doanh thu theo đja chỉ nhận hàng trong năm 2025. (Gợi ý: join VANCHUYEN -> DIACHI, nhóm SUM(TongTien) theo ThanhPho)
+36. Báo cáo doanh thu mỗi danh mục x từng tháng năm 2025, (Goi ý: PIVOT SUM(TongTien) FOR MONTH(NgayDat)
+37. Tìm top 3 sán phàm có biên lợi nhuận (giâà định công thic cho săn) cao nhất trong 2025 (Gợi ý: Tính AVG(GiaBanSauCK) - 0.6*DonGia, sắp xép giảm dần)
+38. Tính doanh thu và tỷ lệ % theo từng phương thức thanh toán trong quý gần nhắt. ( Gou ý: GROUP BY PhuongThuc, SUM(SoTien). % = SoTien/ SUMO OVERO)
+39. Với mỗi hãng DonViVC). tính thời i gian giao trung bình trong 60 ngày gần đây. (Gợi ý: DATEDIFF(DAY, NgayDat, MAX(NgayCapNhat), nhóm theo DonViVC)
+40.Tìm khách hàng đăng ký gàn dây (quý gân nhất) có chi tiêu cao nhất. (Goi ý: loc NgayDangKy, SUM(TongTien) theo MaKH, sắp xếp giảm dần)
+41. Tính số đơn đã thanh toán đủ/ số đơn đắt hàng theo tháng năm 2025. (Gợi ý: COUNT(CASE WHEN Paid-1 THEN 1 END) * 1.0/ COUNT(*)
+42. Tính doanh thu hằng tháng và doanh thu lũy kế theo tháng năm 2025. (Gơi ý: SUM(TongTien) GROUP BY MONTH, thêm SUM(TongTien) OVER (ORDER BY Thang) 43. Tìm khách hàng chi có đúng 1 đơn trong vòng 1 năm gần đây. (Gợi y: COUNT (Don) = 1 với WHERE NgayDat >= DATEADD(YEAR,-1,GETDATE()) )
+44. Liệt kê khách hàng không có địa chỉ mặc định hoặc có >1 đia chỉ (Goi v: GROUP BY MaKH HA VING SUM(CASE WHEN LaMacDinh=1 THEN 1 ELSE 0 END) <> 1
