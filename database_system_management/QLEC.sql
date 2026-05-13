@@ -1,14 +1,7 @@
-﻿/*
-	Xoa database vi nhap nham du lieu
+﻿USE master
 
-	USE master
-	GO
-
-	IF DB_ID('QLECommerce') IS NOT NULL
-		DROP DATABASE QLECommerce
-	GO
-
-*/
+IF DB_ID('QLECommerce') IS NOT NULL
+	DROP DATABASE QLECommerce
 
 CREATE DATABASE QLECommerce
 
@@ -175,48 +168,6 @@ SET TongTien = (
     FROM CTDONDATHANG
     WHERE CTDONDATHANG.MaDon = DONDATHANG.MaDon
 );
-GO
-
--- Bật lại kiểm tra khóa ngoại
-EXEC sp_MSforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL';
-GO
-
-PRINT 'Hoan tat quy trinh: Reset -> Insert -> Update -> Enable Constraints';
-
-/*
-
---Cập nhật TongTien
-UPDATE DONDATHANG
-SET TongTien = (
-    SELECT SUM(SoLuong * DonGia * (1 - ChietKhau/100.0))
-    FROM CTDONDATHANG
-    WHERE CTDONDATHANG.MaDon = DONDATHANG.MaDon
-)
-
-*/
-
-
-/*
-
-CREATE TRIGGER trg_UpdateTongTien
-ON CTDONDATHANG
-AFTER INSERT, UPDATE, DELETE
-AS
-BEGIN
-    UPDATE DONDATHANG
-    SET TongTien = (
-        SELECT SUM(SoLuong * DonGia * (1 - ChietKhau/100.0))
-        FROM CTDONDATHANG
-        WHERE CTDONDATHANG.MaDon = DONDATHANG.MaDon
-    )
-    WHERE MaDon IN (
-        SELECT MaDon FROM inserted
-        UNION
-        SELECT MaDon FROM deleted
-    )
-END
-
-*/
 
 
 --Bai tap chuong 4
@@ -260,7 +211,7 @@ SELECT DM.MaDM, DM.TenDM, SP.MaSP, SP.TenSP
 FROM SANPHAM SP
 JOIN DANHMUC DM ON SP.MaDM = DM.MaDM
 
---9. Đếm số sản phầm trong mỗi danh mục.
+--9. Đếm số sản phẩm trong mỗi danh mục.
 SELECT DM.MaDM, DM.TenDM, COUNT(SP.MaSP) AS SoLuongSP
 FROM DANHMUC DM
 JOIN SANPHAM SP ON DM.MaDM = SP.MaDM
@@ -284,9 +235,8 @@ SELECT MaDon, TrangThai, DonViVC
 FROM VANCHUYEN 
 WHERE NgayCapNhat = GETDATE()
 
-
 --13. Liệt kê Top 10 sản phẩm có Giá cao nhất.
-SELECT TOP 10 WITH TIES *
+SELECT TOP 10 *
 FROM SANPHAM
 ORDER BY GIA DESC
 

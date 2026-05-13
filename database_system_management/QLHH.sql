@@ -1,14 +1,7 @@
-﻿/*
-	Xoa database vi nhap nham du lieu
+﻿USE master
 
-	USE master
-	GO
-
-	IF DB_ID('QLHH') IS NOT NULL
-		DROP DATABASE QLHH
-	GO
-
-*/
+IF DB_ID('QLHH') IS NOT NULL
+	DROP DATABASE QLHH
 
 -- Tao database
 
@@ -458,17 +451,215 @@ DELETE FROM MATHANG WHERE SOLUONG = 0 AND MAHANG NOT IN (SELECT MAHANG FROM CTDA
 SELECT * FROM MATHANG;
 ROLLBACK;
 
-1. Tạo thủ tục lưu trữ đế thông qua thủ tục này có thể bổ sung thêm một bản ghi mới cho bảng MATHANG 
-(thủ tục phải thực hiện kiểm tra tính hợp lệ của dữ liệu cần bỏ sung: không trùng khoá chính và đảm bảo toàn ven tham chiếu)
+--Chuong 6
 
-2. Tạo thủ tục lưu trữ có chức năng thống kê tổng số lượng hàng bán được của một mặt hàng có mã bất kỳ (mã mặt hàng cần thống kê là tham số của thủ tục)
+/*
+1. Tạo thủ tục lưu trữ để thông qua thủ tục này có thể bổ sung thêm một bản ghi mới cho bảng MATHANG 
+(thủ tục phải thực hiện kiểm tra tính hợp lệ của dữ liệu cần bỏ sung: không trùng khoá chính và đảm bảo toàn vẹn tham chiếu)
+*/
+if object_id('sp_NewMatHang', 'p') is not null
+	drop procedure sp_NewMatHang
 
-3. Viết hàm trả về một bảng trong đó cho biết tổng số lượng hàng bán được của mỗi mặt hàng. Sử dụng hàm này để thống kê xem tổng số lượng hàng (hiện có và đã bán) của mỗi mặt hàng là bao nhiêu
+create procedure sp_NewMatHang
+	@Mahang varchar(10),
+	@Tenhang nvarchar(100),
+	@Macongty varchar(10),
+	@Maloaihang varchar(10),
+	@Soluong decimal(10,2),
+	@Donvitinh nvarchar(20),
+	@Giahang money
+as begin
+	if @Mahang is null or ltrim(rtrim(@Mahang)) = ''
+		begin 
+			print('Ma hang khong duoc de trong!')
+			return
+		end
 
+	if exists (select 1 from MATHANG where MAHANG = @Mahang)
+		begin
+			print('Ma hang da ton tai!')
+			return
+		end
+
+	if not exists (select 1 from NHACUNGCAP where MACONGTY = @Macongty)
+		begin
+			print('Ma cong ty khong ton tai!')
+			return
+		end
+
+	if not exists (select 1 from LOAIHANG where MALOAIHANG = @Maloaihang)
+		begin
+			print('Ma loai hang khong ton tai!')
+			return
+		end
+
+	if @Soluong < 0
+		begin 
+			print('So luong khong duoc am!')
+			return
+		end
+
+	if @Giahang <= 0
+		begin
+			print('Gia hang phai lon hon khong!')
+			return
+		end
+
+	insert into MATHANG(MAHANG,TENHANG,MACONGTY,MALOAIHANG,SOLUONG,DONVITINH,GIAHANG)
+	values (@Mahang,@Tenhang,@Macongty,@Maloaihang,@Soluong,@Donvitinh,@Giahang)
+end
+
+exec sp_newMatHang 'MH11', N'Bóng rổ', 'NCC10', 'LH10', 50, N'Quả', 200000
+select * from MATHANG
+
+/*
+2. Tạo thủ tục lưu trữ có chức năng thống kê tổng số lượng hàng bán được của một mặt hàng có mã bất kỳ
+(mã mặt hàng cần thống kê là tham số của thủ tục)
+*/
+if object_id('sp_ThongKeMatHangDaBan') is not null
+	drop procedure sp_ThongKeMatHangDaBan
+
+create procedure sp_ThongKeMatHangDaBan
+	@Mahang varchar(10)
+as begin
+	if @Mahang is null or ltrim(rtrim(@Mahang)) = ''
+		begin
+			print 'Ma hang khong duoc trong!'
+			return
+		end
+
+	if not exists (select 1 from CTDATHANG where MAHANG = @Mahang)
+		begin
+			print 'Ma hang khong ton tai!'
+			return 
+		end
+
+	select MAHANG, sum(SOLUONG) as TongSoLuongDaBan
+	from CTDATHANG
+	where MAHANG = @MaHang
+	group by MAHANG
+end
+
+exec sp_ThongKeMatHangDaBan 'MH01'
+exec sp_ThongKeMatHangDaBan 'MH08'
+
+/*
+3. Viết hàm trả về một bảng trong đó cho biết tổng số lượng hàng bán được của mỗi mặt hàng. 
+Sử dụng hàm này để thống kê xem tổng số lượng hàng (hiện có và đã bán) của mỗi mặt hàng là bao nhiêu
+*/
+drop function if exists fn_ThongKeMatHang
+
+create function fn_ThongKeMatHang()
+returns table
+as return 
+(
+	select mh.MAHANG, mh.TENHANG, mh.SOLUONG, isnull(sum(ct.SOLUONG), 0) as SoLuongDaBan, mh.SOLUONG + isnull(sum(ct.SOLUONG), 0) as Tong
+	from MATHANG mh
+	left join CTDATHANG ct on mh.MAHANG = ct.MAHANG
+	group by mh.MAHANG, mh.TENHANG, mh.SOLUONG
+)
+
+select * from fn_ThongKeMatHang() 
+
+/*
 4. Viết trigger cho bảng CHITIETDATHANG theo yêu cầu sau:
 Khi một bản ghi mới được bổ sung vào bảng này thì giảm số lượng hàng hiện có nếu sản lượng hàng hiện có lớn hơn hoặc bằng số lượng hàng được bán ra. 
 Ngược lại thì huỷ bỏ thao tác bổ sung.
 Khi cập nhật lại số lượng hàng được bán, kiểm tra số lượng hàng được cập nhật lại có phù hợp hay không (số lượng hàng bán ra không được vượt quá số lượng hàng hiện có và không được nhỏ hơn 1). 
 Nếu dữ liệu hợp lệ thì giảm (hoặc tăng) số lượng hàng hiện có trong công ty, ngược lại thì huỷ bỏ thao tác cập nhật
+*/
+drop trigger if exists trg_CapNhatSoLuong
 
-5. Viết trigger cho bảng CHITIETDATHANG đề sao cho chỉ chấp nhận giá hàng bán ra phải lớn hơn hoặc bằng giá gốc (giá cúa mặt hàng trong bảng MATHANG)
+create trigger trg_CapNhatSoLuong
+on CTDATHANG
+after insert, update
+as begin
+	if not exists (select 1 from deleted)
+		begin
+			if exists (
+				select 1 
+				from inserted i
+				join MATHANG mh on i.MAHANG = mh.MAHANG 
+				where mh.SOLUONG < i.SOLUONG
+			)
+				begin
+					print 'Khong du hang!'
+					rollback transaction
+					return
+				end
+
+			update MATHANG
+			set SOLUONG = mh.SOLUONG - i.SOLUONG
+			from MATHANG mh 
+			join inserted i on mh.MAHANG = i.MAHANG
+		end
+	else 
+		begin
+
+			if exists (select 1 from inserted where SOLUONG < 1)
+				begin
+					print 'Hang ban ra phai co so luong!'
+					rollback transaction
+					return
+				end
+		
+			if exists (
+				select 1 from inserted i
+				join deleted d on i.MAHANG = d.MAHANG and i.SOHOADON = d.SOHOADON
+				join MATHANG m on i.MAHANG = m.MAHANG
+				where i.SOLUONG > d.SOLUONG 
+				and m.SOLUONG < (i.SOLUONG - d.SOLUONG)  
+			)
+				begin
+					print 'So luong ban ra khong phu hop!'
+					rollback transaction
+					return
+				end
+
+			update MATHANG
+			set SOLUONG = m.SOLUONG - (i.SOLUONG - d.SOLUONG)
+			from MATHANG m
+			join inserted i on m.MAHANG = i.MAHANG
+			join deleted d on i.MAHANG = d.MAHANG and i.SOHOADON = d.SOHOADON
+		end
+end
+
+
+insert into DONDATHANG values ('HD11', 'KH01', 'NV01', GETDATE(), NULL, NULL, N'Hà Nội')
+
+select MAHANG, SOLUONG from MATHANG where MAHANG = 'MH01'
+
+insert into CTDATHANG values ('HD11', 'MH01', 12000000, 1, 0)
+
+select MAHANG, SOLUONG from MATHANG where MAHANG = 'MH01'
+
+/*
+5. Viết trigger cho bảng CHITIETDATHANG để sao cho chỉ chấp nhận giá hàng bán ra phải lớn hơn hoặc bằng giá gốc 
+(giá của mặt hàng trong bảng MATHANG)
+*/
+drop trigger if exists trg_DieuKienBan
+
+create trigger trg_DieuKienBan
+on CTDATHANG	
+after insert, update
+as begin
+	if exists (
+		select 1 
+		from inserted i
+		join MATHANG mh on i.MAHANG = mh.MAHANG
+		where i.GIABAN < mh.GIAHANG
+	)
+		begin
+			print 'Gia khong hop le!'
+			rollback transaction
+			return
+		end	
+end
+
+select * from CTDATHANG
+
+insert into DONDATHANG values ('HD12', 'KH01', 'NV01', GETDATE(), NULL, NULL, N'Hà Nội')
+
+insert into CTDATHANG values ('HD12', 'MH01', 5000000, 1, 0)
+
+insert into CTDATHANG values ('HD12', 'MH01', 12000000, 1, 0)

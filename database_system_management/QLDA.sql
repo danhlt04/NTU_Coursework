@@ -1,14 +1,7 @@
-﻿/*
-	Xoa database vi nhap nham du lieu
+﻿USE master
 
-	USE master
-	GO
-
-	IF DB_ID('QLDA') IS NOT NULL
-		DROP DATABASE QLDA
-	GO
-
-*/
+IF DB_ID('QLDA') IS NOT NULL
+	DROP DATABASE QLDA
 
 CREATE DATABASE QLDA
 
@@ -350,7 +343,7 @@ WHERE PB.MAPB IN (
 	FROM MaxNu
 )
 
--- 35. Tên nhân viên được phân công làm việc cho tất cá các đề án của phòng P2.
+-- 35. Tên nhân viên được phân công làm việc cho tất cả các đề án của phòng P2.
 SELECT NV.MANV, NV.TENNV
 FROM NHANVIEN NV
 JOIN PHANCONG PC ON NV.MANV = PC.MANV
@@ -511,55 +504,404 @@ DROP USER ke_toan_user;
 DROP LOGIN ke_toan_qlda;
 
 
---Store Procedure 
-1. Tìm danh sách nhân viên theo mã phòng ban
+--STORE PROCEDURE 
 
-2. Tìm danh sách thân nhân theo mã nhân viên
+--1. Tìm danh sách nhân viên theo mã phòng ban
+IF OBJECT_ID('sp_Find_NV', 'p') IS NOT NULL
+	DROP PROCEDURE sp_Find_NV 
 
-3.Tìm những nhân viên theo mã phòng ban có có mức lương cao hơn mức lương cần tìm
+CREATE PROCEDURE sp_Find_NV
+	@Mapb varchar(5)
+AS
+BEGIN
+	SELECT *
+	FROM NHANVIEN
+	WHERE MAPB = @Mapb
+END
 
-4.Thêm thông tin cho nhân viên mới (SP_THEM_NHANVIEN), yêu cầu chỉ thêm nhân viên phòng Nghiên cứu
+EXEC sp_Find_NV 'P2'
 
-5. Tìm danh sách các đề án được thực hiện bởi nhân viên có mã cho trước (SP_DEAN_MANV)
+--2. Tìm danh sách thân nhân theo mã nhân viên
+IF OBJECT_ID('sp_Find_TN', 'p') IS NOT NULL
+	DROP PROCEDURE sp_Find_TN
 
-6. Tính lương trung bình của phòng ban theo tên phòng (SP_LUONGTB_TENPB)
+CREATE PROCEDURE sp_Find_TN
+	@Manv varchar(5)
+AS
+BEGIN
+	SELECT *
+	FROM THANNHAN
+	WHERE MANV = @Manv
+END
 
-7. Cho biết danh sách các công việc được phân công cho các nhần viên ở phòng ban cần tìm theo mã phòng (SP_CV_MAPHG)
+EXEC sp_Find_TN 'NV1'
 
-8. Tính số lượng công việc của nhân viên theo mã nhân viên (SP SOCV MANV)
 
---FUNCTIONS 
+-- 3. Tìm những nhân viên theo mã phòng ban có có mức lương cao hơn mức lương cần tìm
+IF OBJECT_ID('sp_Find_Luongcao', 'p') IS NOT NULL
+	DROP PROCEDURE sp_Find_Luongcao
 
-9. Cho biết địa chỉ của một nhân viên dựa theo tên nhân viên
+CREATE PROCEDURE sp_Find_Luongcao
+	@Luong decimal(10, 2)
+AS
+BEGIN
+	SELECT MAPB, COUNT(MAPB) as SL
+	FROM NHANVIEN
+	WHERE LUONG > @Luong
+	GROUP BY MAPB
+END
 
-10. Truyền vào một mã nhân viên, cho biết họ tên đầy đủ của nhân viên quản lý nhân viên đó
+EXEC sp_Find_Luongcao 30000
 
-11. Tên công việc của nhân viên cần tìm theo mã nhân viên đó
+-- 4. Thêm thông tin cho nhân viên mới (SP_THEM_NHANVIEN), yêu cầu chỉ thêm nhân viên phòng Nghiên cứu
+if object_id('sp_them_nhanvien', 'p') is not null
+	drop procedure sp_them_nhanvien
 
-12. Cho biết tên của thân nhân có quan hệ vợ chồng với nhân viên theo mã
+create procedure sp_them_nhanvien
+	@Manv varchar(5),
+	@Honv nvarchar(20),
+	@Tenlot nvarchar(20),
+	@Tennv nvarchar(10),
+	@Ngaysinh date,
+	@Diachi nvarchar(100),
+	@Phai varchar(5),
+	@Luong decimal(10,2),
+	@Mapb varchar(5)
+as begin
+	 if(@Mapb <> 'P3')
+		begin 
+			print('Chi duoc them nhan vien vao phong nghien cuu!')
+			return
+		end
 
-13. Với mã phòng ban cho trước, tính lương trung bình của phòng ban đó
+	insert into NHANVIEN(MANV, HONV, TENLOT, TENNV, NGAYSINH, DIACHI, PHAI, LUONG, MAPB)
+	values (@Manv, @Honv, @Tenlot, @Tennv, @Ngaysinh, @Diachi, @Phai, @Luong, @Mapb)
+end
 
-14. Tính giờ công thực hiện để án cúa phòng ban theo mã phòng
+-- 5. Tìm danh sách các đề án được thực hiện bởi nhân viên có mã cho trước (SP_DEAN_MANV)
+if object_id('sp_dean_by_nhanvien', 'p') is not null
+	drop procedure sp_dean_nhanvien
 
-15. Cho biết số lượng nhân viên của phòng ban theo mã phòng
+create procedure sp_dean_nhanvien
+	@Manv varchar(5)
+as begin
+	select da.MADA, da.TENDA, da.DDIEM_DA, pc.THOIGIAN 
+	from dean da
+	join PHANCONG pc on pc.MADA = da.MADA
+	where pc.MANV = @Manv
+end
 
-16. Họ tên đầy đủ của trưởng phòng cúa nhân viên theo mã nhân viên
+exec sp_dean_nhanvien 'NV1'
 
-17. Cho biết tên đề án của phòng ban chủ trì theo mã phòng ban
+-- 6. Tính lương trung bình của phòng ban theo tên phòng (SP_LUONGTB_TENPB)
+if object_id('sp_luongtb_pb', 'p') is not null 
+	drop procedure sp_luongtb_pb
 
-18. Tìm những nhân viên theo mã phòng ban có có mức lương cao hơn mức lương cần tìm
+create procedure sp_luongtb_pb
+	@Tenpb nvarchar(500)
+as begin 
+	select pb.TENPB, avg(nv.LUONG) as Luongtb
+	from NHANVIEN nv
+	join PHONGBAN pb on pb.MAPB = nv.MAPB
+	where pb.TENPB = @Tenpb
+	group by pb.TENPB
+end
 
-19. Tìm danh sách các đề án được thực hiện bởi nhân viên có mã cho trước
+exec sp_luongtb_pb N'NGHIENCUU'
 
-20. Tính lương trung bình của phòng ban theo tên phòng
+-- 7. Cho biết danh sách các công việc được phân công cho các nhần viên ở phòng ban cần tìm theo mã phòng (SP_CV_MAPHG)
+if object_id('sp_congviec_pc', 'p') is not null
+	drop procedure sp_congviec_pc
+
+create procedure sp_congviec_pc
+	@Mapb varchar(5)
+as begin
+	select nv.MANV, nv.TENNV, da.MADA, da.TENDA, pc.THOIGIAN
+	from NHANVIEN nv
+	join PHANCONG pc on pc.MANV = nv.MANV
+	join DEAN da on da.MADA = pc.MADA
+	where nv.MAPB = @Mapb
+end
+
+exec sp_congviec_pc 'P3'
+
+-- 8. Tính số lượng công việc của nhân viên theo mã nhân viên (SP SOCV MANV)
+if object_id('sp_socv_nv', 'p') is not null
+	drop procedure sp_socv_nv
+
+create procedure sp_socv_nv
+	@Manv varchar(5)
+as begin
+	select MANV, count(*) as SLCongViec
+	from PHANCONG
+	where MANV = @Manv
+	group by MANV
+end
+
+exec sp_socv_nv 'NV1'
+
+--FUNCTION
+
+--9. Cho biết địa chỉ của một nhân viên dựa theo tên nhân viên
+DROP FUNCTION IF EXISTS FN_DiaChiNhanVien
+GO
+CREATE FUNCTION FN_DiaChiNhanVien (
+	@Ten VARCHAR(10)
+)
+RETURNS NVARCHAR(100)
+AS
+BEGIN 
+	DECLARE @DC NVARCHAR(100)
+	SELECT @DC = DIACHI 
+	FROM NHANVIEN 
+	WHERE TENNV = @Ten
+	RETURN @DC
+END
+GO
+SELECT dbo.FN_DiaChiNhanVien('TIEN')
+
+--10. Truyền vào một mã nhân viên, cho biết họ tên đầy đủ của nhân viên quản lý nhân viên đó
+DROP FUNCTION IF EXISTS FN_HoTenQuanLy
+GO
+CREATE FUNCTION FN_HoTenQuanLy(@Manv varchar(5))
+RETURNS nvarchar(50)
+AS
+BEGIN
+    DECLARE @HoTen nvarchar(50)
+    SELECT @HoTen = tp.HONV + N' ' + tp.TENLOT + N' ' + tp.TENNV
+    FROM NHANVIEN nv
+    JOIN PHONGBAN pb ON pb.MAPB = nv.MAPB
+    JOIN NHANVIEN tp ON tp.MANV = pb.TRUONGPHONG
+    WHERE nv.MANV = @Manv
+    RETURN @HoTen
+END
+GO
+SELECT dbo.FN_HoTenQuanLy('NV1')
+
+--11. Tên công việc của nhân viên cần tìm theo mã nhân viên đó
+drop function if exists fn_tencongviec
+go
+create function fn_tencongviec(@Manv varchar(5))
+returns table
+as return (
+	select da.MADA, da.TENDA, pc.THOIGIAN
+	from DEAN da
+	join PHANCONG pc on pc.MADA = da.MADA
+	where pc.MANV = @Manv
+)
+go
+select * from dbo.fn_tencongviec('NV1')
+
+--12. Cho biết tên của thân nhân có quan hệ vợ chồng với nhân viên theo mã
+drop function if exists fn_vochong
+go
+create function fn_vochong(@Manv varchar(5))
+returns nvarchar(30)
+as begin 
+	declare @Ten nvarchar(30)
+	select @Ten = TENTN
+	from THANNHAN 
+	where MANV = @Manv and QUANHE in(N'VỢ', N'CHỒNG')
+	return @Ten
+end
+go
+select dbo.fn_vochong('NV1')
+
+--13. Với mã phòng ban cho trước, tính lương trung bình của phòng ban đó
+drop function if exists fn_luongtb_pb
+go
+create function fn_luongtb_pb(@Mapb varchar(5))
+returns decimal(10,2)
+as begin
+	declare @Ltb decimal(10,2)
+	select @Ltb = avg(LUONG) 
+	from NHANVIEN
+	where MAPB = @Mapb
+	return @Ltb
+end
+go 
+select dbo.fn_luongtb_pb('P3')
+
+--14. Tính giờ công thực hiện để án cúa phòng ban theo mã phòng
+drop function if exists fn_giocong_pb
+go
+create function fn_giocong_pb(@Mapb varchar(5))
+returns decimal(10,1)
+as begin
+	declare @Gc decimal(10,1)
+	select @Gc = sum(pc.THOIGIAN)
+	from PHANCONG pc
+	join NHANVIEN nv on nv.MANV = pc.MANV
+	where nv.MAPB = @Mapb
+	return @Gc
+end
+go
+select dbo.fn_giocong_pb('P3')
+
+--15. Cho biết số lượng nhân viên của phòng ban theo mã phòng
+drop function if exists fn_soluongnv
+go
+create function fn_soluongnv(@Mapb varchar(5))
+returns int
+as begin 
+	declare @Sl int
+	select @Sl = count(*)
+	from NHANVIEN 
+	where MAPB = @Mapb
+	return @Sl
+end
+go
+select dbo.fn_soluongnv('P3')
+
+--16. Họ tên đầy đủ của trưởng phòng cúa nhân viên theo mã nhân viên
+drop function if exists fn_soluongnv
+go
+create function fn_soluongnv(@Mapb varchar(5))
+returns int
+as begin
+	declare @Sl int
+	select @Sl = count(*)
+	from NHANVIEN
+	where MAPB = @Mapb
+	return @Sl
+end
+go
+select dbo.fn_soluongnv('P3')
+
+--17. Cho biết tên đề án của phòng ban chủ trì theo mã phòng ban
+drop function if exists fn_tendean_pb
+go
+create function fn_tendean_pb(@Mapb varchar(5))
+returns table 
+as return (
+	select MADA, TENDA, DDIEM_DA
+	from DEAN
+	where MAPB = @Mapb
+)
+go 
+select * from dbo.fn_tendean_pb('P3')
+
+--18. Tìm những nhân viên theo mã phòng ban có có mức lương cao hơn mức lương cần tìm
+drop function if exists fn_nvluongcao
+go 
+create function fn_nvluongcao(@Mapb varchar(5), @Luong decimal(10,2))
+returns table 
+as return (
+	select MANV, HONV, TENLOT, TENNV, LUONG
+	from NHANVIEN
+	where MAPB = @Mapb and LUONG > @Luong
+)
+go
+select * from dbo.fn_nvluongcao('P3', 25000)
+
+--19. Tìm danh sách các đề án được thực hiện bởi nhân viên có mã cho trước
+drop function if exists fn_dean
+go
+create function fn_dean(@Manv varchar(5))
+returns table 
+as return (
+	select da.MADA, da.TENDA, da.DDIEM_DA, pc.THOIGIAN
+	from DEAN da
+	join PHANCONG pc on pc.MADA = da.MADA
+	where pc.MANV = @Manv
+)
+go
+select * from dbo.fn_dean('NV2')
+
+--20. Tính lương trung bình của phòng ban theo tên phòng
+drop function if exists fn_luongtb
+go
+create function fn_luongtb(@Tenpb nvarchar(50))
+returns decimal
+as begin
+	declare @Ltb decimal(10,2)
+	select @Ltb = avg(nv.LUONG)
+	from NHANVIEN nv
+	join PHONGBAN pb on pb.MAPB = nv.MAPB
+	where pb.TENPB = @Tenpb
+	return @Ltb
+end
+go
+select dbo.fn_luongtb(N'NGHIENCUU')
 
 /* TRIGGER */
 
-21. Cài đặt ràng buộc không cho nhân viên có MaNV-1 tham gia đề án số 2
+-- 21. Cài đặt ràng buộc không cho nhân viên có MaNV=1 tham gia đề án số 2
+if object_id('trg_constr_nv1','tr') is not null
+	drop trigger trg_constr_nv1
 
-22. Cài đặt ràng buộc sao cho lương của trưởng phòng phải lớn hơn lương của nhân viên
+create trigger trg_constr_nv1
+on PHANCONG 
+instead of insert
+as begin
+	if exists (
+		select 1
+		from inserted 
+		where MANV = 'NV1' and MADA = 'DA2'
+	)
+		begin
+			print('Nhan vien co ma NV1 khong duoc tham gia de an co ma DA2!')
+			return
+		end
 
-23. Cài đặt ràng buộc sao cho một nhân viên không được tham gia quá 3 đề án
+	insert into PHANCONG(MANV, MADA, THOIGIAN)
+	select MANV, MADA, THOIGIAN
+	from inserted
+end
 
+-- 22. Cài đặt ràng buộc sao cho lương của trưởng phòng phải lớn hơn lương của nhân viên
+if object_id('trg_luong', 'tr') is not null
+	drop trigger trg_luong
 
+create trigger trg_luong
+on NHANVIEN
+after insert, update
+as begin
+	if exists (
+		select 1
+		from inserted i
+		join PHONGBAN pb on pb.TRUONGPHONG = i.MANV
+		join NHANVIEN nv on pb.MAPB = nv.MAPB and nv.MANV <> i.MANV
+		where i.LUONG <= nv.LUONG
+	)
+		begin
+			rollback transaction
+			print('Luong truong phong phai lon hon tat ca nhan vien trong phong')
+			return
+		end
+
+	if exists (
+		select 1
+		from inserted i
+		join PHONGBAN pb on pb.MAPB = i.MAPB and pb.TRUONGPHONG <> i.MANV
+		join NHANVIEN nv on nv.MANV = pb.TRUONGPHONG
+		where i.LUONG >= nv.LUONG
+	)
+		begin
+			rollback transaction
+			print('Luong nhan vien phai nho hon luong truong phong')
+			return
+		end
+end
+
+-- 23. Cài đặt ràng buộc sao cho một nhân viên không được tham gia quá 3 đề án
+if object_id('trg_dean', 'tr') is not null
+	drop trigger trg_dean
+
+create trigger trg_dean
+on PHANCONG
+after insert, update
+as begin
+	if exists (
+		select MANV
+		from PHANCONG
+		where MANV in (select MANV from inserted)
+		group by MANV
+		having count(*) > 3
+	)
+		begin 
+			rollback transaction
+			print('Nhan vien khong duoc tham gia qua 3 de an')
+			return
+		end
+end

@@ -1,14 +1,7 @@
-﻿/*
-	Xoa database vi nhap nham du lieu
+﻿USE master
 
-	USE master
-	GO
-
-	IF DB_ID('QLBD') IS NOT NULL
-		DROP DATABASE QLBD
-	GO
-
-*/
+IF DB_ID('QLBD') IS NOT NULL
+	DROP DATABASE QLBD
 
 CREATE DATABASE QLBongDa
 
@@ -213,7 +206,7 @@ SELECT TENHLV, NGAYSINH, DIACHI, DIENTHOAI FROM HUANLUYENVIEN
 SELECT CT.* FROM CAUTHU CT JOIN CAULACBO CLB ON CT.MACLB = CLB.MACLB WHERE CT.MAQG = 'VN' AND CLB.TENCLB = N'BECAMEX BÌNH DƯƠNG'
 
 -- 5. Cho biết mã số, họ tên, ngày sinh, địa chỉ và vị trí của các cầu thủ thuộc đội bóng "SHB Đà Nẵng" có quốc tịch "Braxin".
-SELECT MACT, HOTEN, NGAYSINH, CT.DIACHI, VITRI FROM CAUTHU CT JOIN CAULACBO CLB ON CT.MACLB = CLB.MACLB JOIN QUOCGIA QG ON CT.MAQG = QG.MAQG WHERE CLB.TENCLB = N'SHB ĐÀ NẴNG' AND Q.TENQG = N'Bra-xin';
+SELECT MACT, HOTEN, NGAYSINH, CT.DIACHI, VITRI FROM CAUTHU CT JOIN CAULACBO CLB ON CT.MACLB = CLB.MACLB JOIN QUOCGIA QG ON CT.MAQG = QG.MAQG WHERE CLB.TENCLB = N'SHB ĐÀ NẴNG' AND QG.TENQG = N'Bra-xin';
 
 -- 6. Hiển thị thông tin các cầu thủ đang thi đấu trong câu lạc bộ sân nhà "Long An".
 SELECT CT.* FROM CAUTHU CT JOIN CAULACBO CLB ON CT.MACLB = CLB.MACLB JOIN SANVD SVD ON CLB.MASAN = SVD.MASAN WHERE SVD.TENSAN = N'Long An';
@@ -221,7 +214,7 @@ SELECT CT.* FROM CAUTHU CT JOIN CAULACBO CLB ON CT.MACLB = CLB.MACLB JOIN SANVD 
 -- 7. Cho biết kết quà (MATRAN, NGAYTD, TENSAN, TENCLB1, TENCLB2, KETQUA) các trận đấu vòng 2 của mùa bóng năm 2025.
 SELECT TD.MATRAN, TD.NGAYTD, SVD.TENSAN, C1.TENCLB, C2.TENCLB, TD.KETQUA FROM TRANDAU TD JOIN SANVD SVD ON TD.MASAN = SVD.MASAN JOIN CAULACBO C1 ON TD.MACLB1 = C1.MACLB JOIN CAULACBO C2 ON TD.MACLB2 = C2.MACLB WHERE TD.VONG = 2 AND TD.NAM = 2025;
 
--- 8. Cho biết mã huấn luyện viên, họ tên, ngày sỉnh, địa chỉ, vai trò và tên CLB đang làm việc của các huấn luyện viên có quốc tịch "Việt Nam".
+-- 8. Cho biết mã huấn luyện viên, họ tên, ngày sinh, địa chỉ, vai trò và tên CLB đang làm việc của các huấn luyện viên có quốc tịch "Việt Nam".
 SELECT HLV.MAHLV, HLV.TENHLV, HLV.NGAYSINH, HLV.DIACHI, HC.VAITRO, CLB.TENCLB 
 FROM HUANLUYENVIEN HLV
 JOIN HLV_CLB HC ON HLV.MAHLV = HC.MAHLV 
@@ -231,10 +224,10 @@ WHERE HLV.MAQG = 'VN';
 -- 9. Lấy tên 3 câu lac bộ có điểm cao nhất sau vòng 3 năm 2025.
 SELECT TOP 3 C.TENCLB FROM BANGXH B JOIN CAULACBO C ON B.MACLB = C.MACLB WHERE B.VONG = 3 AND B.NAM = 2025 ORDER BY B.DIEM DESC;
 
--- 10. Cho biết mã huấn luyện viên, họ tên, ngày sinh, dia chỉ, vai trò và tên CLB đang làm việc mà câu lạc bộ đó đóng ở tỉnh Bình Dương.
+-- 10. Cho biết mã huấn luyện viên, họ tên, ngày sinh, địa chỉ, vai trò và tên CLB đang làm việc mà câu lạc bộ đó đóng ở tỉnh Bình Dương.
 SELECT H.MAHLV, H.TENHLV, H.NGAYSINH, H.DIACHI, HC.VAITRO, C.TENCLB FROM HUANLUYENVIEN H JOIN HLV_CLB HC ON H.MAHLV = HC.MAHLV JOIN CAULACBO C ON HC.MACLB = C.MACLB JOIN TINH T ON C.MATINH = T.MATINH WHERE T.TENTINH = N'Bình Dương';
 
--- 11. Thống kê số lượng cầu thù của mỗi câu lạc bộ.
+-- 11. Thống kê số lượng cầu thủ của mỗi câu lạc bộ.
 SELECT MACLB, COUNT(MACT) AS SOLUONG FROM CAUTHU GROUP BY MACLB;
 
 -- 12. Thống kế số lượng cầu thủ nước ngoài (có quốc tịch khác Việt Nam) của mỗi câu lạc bộ. 
@@ -243,16 +236,16 @@ SELECT MACLB, COUNT(MACT) AS SL_NGOAI FROM CAUTHU WHERE MAQG <> 'VN' GROUP BY MA
 -- 13. Cho biết mã câu lạc bộ, tên câu lạc bộ, tên sân vận động, địa chỉ và số lượng cầu thủ nuớc ngoài (có quốc tịch khác "Viet Nam") tương ứng của các câu lac bộ có nhiều hơn 2 cầu thủ nước ngoài.
 SELECT CLB.MACLB, CLB.TENCLB, SVD.TENSAN, SVD.DIACHI, COUNT(CT.MACT) FROM CAULACBO CLB JOIN SANVD SVD ON CLB.MASAN = SVD.MASAN JOIN CAUTHU CT ON CLB.MACLB = CT.MACLB WHERE CT.MAQG <> 'VN' GROUP BY CLB.MACLB, CLB.TENCLB, SVD.TENSAN, SVD.DIACHI HAVING COUNT(CT.MACT) > 2;
 
--- 14.Cho biết tên tỉnh, số lượng cầu thủ đang thi đấu ở vị trí tiền đạo trong các câu lạc bộ thuốc địa bàn tỉnh đó quản lý.
-SELECT T.TENTINH, COUNT(CT.MACT) FROM TINH T JOIN CAULACBO CLB ON T.MATINH = CLB.MATINH JOIN CAUTHU CT ON CLB.MACLB = CT.MACLB WHERE CT.VITRI = N'Tiền đạo' GROUP BY T.TENTINH;
+-- 14.Cho biết tên tỉnh, số lượng cầu thủ đang thi đấu ở vị trí tiền đạo trong các câu lạc bộ thuộc địa bàn tỉnh đó quản lý.
+SELECT T.TENTINH, COUNT(CT.MACT) AS SoLuong FROM TINH T JOIN CAULACBO CLB ON T.MATINH = CLB.MATINH JOIN CAUTHU CT ON CLB.MACLB = CT.MACLB WHERE CT.VITRI = N'Tiền đạo' GROUP BY T.TENTINH;
 
 -- 15. Cho biết tên câu lạc bộ, tên tỉnh mà CLB đang đóng nằm ở vị trí cao nhất của bảng xếp hạng của vòng 3, năm 2025.
 SELECT CLB.TENCLB, T.TENTINH FROM BANGXH BXH JOIN CAULACBO CLB ON BXH.MACLB = CLB.MACLB JOIN TINH T ON CLB.MATINH = T.MATINH WHERE BXH.VONG = 3 AND BXH.NAM = 2025 AND BXH.HANG = 1;
 
--- 16.Cho biết tên huấn luyện viên đang năm giữ một vị trí trong một câu lạc bộ mà chưa có số điện thoại.
+-- 16.Cho biết tên huấn luyện viên đang nắm giữ một vị trí trong một câu lạc bộ mà chưa có số điện thoại.
 SELECT HLV.TENHLV FROM HUANLUYENVIEN HLV JOIN HLV_CLB HC ON HLV.MAHLV = HC.MAHLV WHERE HLV.DIENTHOAI IS NULL OR HLV.DIENTHOAI = '';
 
--- 17.Liệt kế các huấn luyện viên thuộc quốc gia Việt Nam chưa làm công tác huấn luyện tai bất kỳ một câu lạc bộ nào.
+-- 17.Liệt kê các huấn luyện viên thuộc quốc gia Việt Nam chưa làm công tác huấn luyện tai bất kỳ một câu lạc bộ nào.
 SELECT TENHLV FROM HUANLUYENVIEN WHERE MAQG = 'VN' AND MAHLV NOT IN (SELECT MAHLV FROM HLV_CLB);
 
 -- 18. Liệt kê các cầu thủ đang thi đấu trong các câu lạc bộ có thứ hạng ở vòng 3 năm 2025 lớn hơn 6 hoặc nhỏ hơn 3.

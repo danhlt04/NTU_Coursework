@@ -1,14 +1,7 @@
-﻿/*
-	Xoa database vi nhap nham du lieu
+﻿USE master
 
-	USE master
-	GO
-
-	IF DB_ID('QLTV') IS NOT NULL
-		DROP DATABASE QLTV
-	GO
-
-*/
+IF DB_ID('QLTV') IS NOT NULL
+	DROP DATABASE QLTV
 
 CREATE DATABASE QLTV
 
@@ -407,7 +400,7 @@ Tạo các store procedure như sau
 4.1. Xem thông tin độc giả:
 Tên: sp_ThongtinDocGia
 Nội dung: Liệt kê những thông tin của độc giả tương ứng với mã độc giả. 
-Nếu độc già là người lớn thì hiền thị thông tin độc giả + thông tin trong bảng người lớn.
+Nếu độc giả là người lớn thì hiền thị thông tin độc giả + thông tin trong bảng người lớn.
 Nếu độc giả là trẻ em thì hiển thị những thông tin độc giả + thông tin của bảng trẻ em.
 Các bước thực hiện:
 [1] Kiểm tra độc giả này thuộc loại người lớn hay trẻ em.
@@ -435,6 +428,10 @@ BEGIN
         PRINT N'Không tìm thấy độc giả này!';
 END
 
+EXEC sp_ThongtinDocGia @Ma_DocGia = 'DG001';   -- Người lớn
+EXEC sp_ThongtinDocGia @Ma_DocGia = 'DG006';   -- Trẻ em
+EXEC sp_ThongtinDocGia @Ma_DocGia = 'DG999';   -- Không tồn tại
+
 /*
 4.2. Thông tin đầu sách:
 Tên: sp_ThongtinDausach
@@ -454,10 +451,13 @@ BEGIN
     WHERE ds.ISBN = @ISBN;
 END
 
+EXEC sp_ThongtinDausach @ISBN = '978-604-1';
+EXEC sp_ThongtinDausach @ISBN = '978-604-3';
+
 /*
 4.3. Liệt kê những độc giả người lớn đang mượn sách:
 Tên: sp_ThongtinNguoilonDangmuon
-Nội dung: Liệt kê những thông tin của tất cá độc giả đang mượn sách của thư viện
+Nội dung: Liệt kê những thông tin của tất cả độc giả đang mượn sách của thư viện
 */
 
 CREATE OR ALTER PROC sp_ThongtinNguoilonDangmuon
@@ -468,6 +468,8 @@ BEGIN
     JOIN NguoiLon nl ON dg.Ma_DocGia = nl.Ma_DocGia
     JOIN Muon m ON dg.Ma_DocGia = m.Ma_DocGia;
 END
+
+EXEC sp_ThongtinNguoilonDangmuon;
 
 /*
 4.4. Liệt kê những độc giả người lớn đang mượn sách quá hạn:
@@ -485,6 +487,8 @@ BEGIN
     WHERE DATEDIFF(day, m.NgayHetHan, GETDATE()) > 14;
 END
 
+EXEC sp_ThongtinNguoilonQuahan;
+
 /*
 4.5. Liệt kê những độc giả người lớn đang mượn sách có trẻ em cũng đang mượn sách:
 Tên: sp_DocGiaCoTreEmMuon
@@ -496,14 +500,17 @@ AS
 BEGIN
     SELECT DISTINCT dg_nl.*
     FROM DocGia dg_nl
-    JOIN Muon m_nl ON dg_nl.Ma_DocGia = m_nl.Ma_DocGia -- Người lớn đang mượn
-    JOIN TreEm te ON dg_nl.Ma_DocGia = te.Ma_DocGia_NguoiLon
-    JOIN Muon m_te ON te.Ma_DocGia = m_te.Ma_DocGia; -- Trẻ em được bảo lãnh cũng đang mượn
+    JOIN NguoiLon nl ON dg_nl.Ma_DocGia = nl.Ma_DocGia      -- ← THÊM JOIN NguoiLon
+    JOIN Muon m_nl  ON dg_nl.Ma_DocGia = m_nl.Ma_DocGia       -- Người lớn đang mượn
+    JOIN TreEm te   ON dg_nl.Ma_DocGia = te.Ma_DocGia_NguoiLon
+    JOIN Muon m_te  ON te.Ma_DocGia    = m_te.Ma_DocGia;       -- Trẻ em được bảo lãnh cũng đang mượn
 END
+
+EXEC sp_DocGiaCoTreEmMuon;
 
 /*
 4.6. Cập nhật trạng thái của đầu sách:
-Nội dung: Cập nhật trạng thái của một đầu sách cu thế tương ứng với isbn: nếu đầu sách không còn cuốn sách nào trong thư viện thì tình trạng là no; 
+Nội dung: Cập nhật trạng thái của một đầu sách cụ thể tương ứng với isbn: nếu đầu sách không còn cuốn sách nào trong thư viện thì tình trạng là no; 
 nếu đầu sách còn một quyền sách trở lên thì tình trạng là 'Y'
 Tên: sp_CapnhatTrangthaiDausach
 Bước thực hiện 
@@ -525,6 +532,9 @@ BEGIN
     ELSE
         UPDATE DauSach SET TrangThai = 'Yes' WHERE ISBN = @ISBN;
 END
+
+EXEC sp_CapnhatTrangthaiDausach @ISBN = '978-604-1';
+SELECT ISBN, TrangThai FROM DauSach WHERE ISBN = '978-604-1';
 
 /*
 4.7. Thêm tựa sách mới:
@@ -593,28 +603,53 @@ Bước thực hiện
 */
 
 CREATE OR ALTER PROC sp_ThemNguoilon
-    @Ma_DocGia varchar(50), @Ho nvarchar(30), @TenLot nvarchar(30), @Ten nvarchar(30), @NgaySinh date,
-    @SoNha varchar(20), @Duong nvarchar(50), @Quan tinyint, @DienThoai varchar(12), @HanSuDung date
+    @Ma_DocGia  varchar(50),
+    @Ho         nvarchar(30),
+    @TenLot     nvarchar(30),
+    @Ten        nvarchar(30),
+    @NgaySinh   date,
+    @SoNha      varchar(20),
+    @Duong      nvarchar(50),
+    @Quan       tinyint,
+    @DienThoai  varchar(12),
+    @HanSuDung  date
 AS
 BEGIN
-    IF DATEDIFF(YEAR, @NgaySinh, GETDATE()) < 18
+    -- SỬA: Tính tuổi chính xác (xét ngày/tháng sinh)
+    DECLARE @Tuoi int;
+    SET @Tuoi = DATEDIFF(YEAR, @NgaySinh, GETDATE())
+              - CASE
+                    WHEN (MONTH(@NgaySinh) > MONTH(GETDATE()))
+                      OR (MONTH(@NgaySinh) = MONTH(GETDATE())
+                          AND DAY(@NgaySinh) > DAY(GETDATE()))
+                    THEN 1
+                    ELSE 0
+                END;
+ 
+    IF @Tuoi < 18
     BEGIN
         PRINT N'Lỗi: Độc giả chưa đủ 18 tuổi để làm người lớn.';
         RETURN;
     END
-
+ 
     BEGIN TRAN
         BEGIN TRY
             INSERT INTO DocGia VALUES (@Ma_DocGia, @Ho, @TenLot, @Ten, @NgaySinh);
             INSERT INTO NguoiLon VALUES (@Ma_DocGia, @SoNha, @Duong, @Quan, @DienThoai, @HanSuDung);
-            COMMIT TRAN
+            COMMIT TRAN;
             PRINT N'Thêm người lớn thành công!';
         END TRY
         BEGIN CATCH
-            ROLLBACK TRAN
-            PRINT N'Lỗi hệ thống khi thêm người lớn!';
+            ROLLBACK TRAN;
+            PRINT N'Lỗi hệ thống khi thêm người lớn: ' + ERROR_MESSAGE();
         END CATCH
 END
+
+EXEC sp_ThemNguoilon
+    @Ma_DocGia = 'DG011', @Ho = N'Hoàng', @TenLot = N'Văn', @Ten = N'Bình',
+    @NgaySinh  = '2010-06-15',
+    @SoNha = '10', @Duong = N'Lê Duẩn', @Quan = 1,
+    @DienThoai = '0900000011', @HanSuDung = '2027-01-01';
 
 /*
 4.10. Thêm độc giả trẻ em:
@@ -630,7 +665,7 @@ Bước thực hiện:
 [5] Nếu thỏa quy định QĐ-3 thì thêm một bộ dữ liệu vào bảng trẻ em.
 */
 
-CREATE PROC sp_ThemTreEm
+CREATE OR ALTER PROC sp_ThemTreEm
     @Ma_DocGia varchar(50),
     @Ho nvarchar(30),
     @TenLot nvarchar(30),
@@ -684,17 +719,21 @@ BEGIN
     END CATCH
 END
 
+EXEC sp_ThemTreEm
+    @Ma_DocGia = 'DG012', @Ho = N'Hoàng', @TenLot = N'Minh', @Ten = N'Khoa',
+    @NgaySinh  = '2015-03-20', @Ma_DocGia_NguoiLon = 'DG011';
+
 /*
 4.11. Xóa độc giả:
 Tên: sp_XoaDocGia
 Nội dung: Xóa toàn bộ thông tin liên quan đến độc giả này gồm có: quá trình mượn, đăng ký, mượn, độc giả, 
 người lớn (nếu độc giả này là người lớn), 
-trẻ em (nếu độc giả là trè em hay độc giả người lớn có bảo lãnh trẻ em). 
+trẻ em (nếu độc giả là trẻ em hay độc giả người lớn có bảo lãnh trẻ em). 
 Chỉ thực hiện xóa khi độc giả không đang mượn sách.
 Bước thực hiện:
 [1] Kiểm tra xem độc giả có tồn tại hay không.
 Nếu độc giả không tồn tại thì thông báo không tôn tại độc giả và kết thúc. 
-[2] Kiểm tra độc giả có đang mượng sách hay khôn. Nếu độc giả có mượn sách thì thông báo không thể xóa được và kết thúc. 
+[2] Kiểm tra độc giả có đang mượn sách hay không. Nếu độc giả có mượn sách thì thông báo không thể xóa được và kết thúc. 
 [3] Kiểm tra độc giả này là độc giả người lớn hay trẻ em: 
 	[3.1] Nếu độc giả là người lớn:
 		[3.1.1] Kiểm tra xem độc giả có bảo lãnh trẻ em nào hay không?
@@ -715,7 +754,7 @@ Ghi chú: Nếu trong lúc tạo khóa ngoại có sử dụng delete cascade th
 Trong hướng dẫn này, không cài delete cascade! 
 */
 
-CREATE PROC sp_XoaDocGia
+CREATE OR ALTER PROC sp_XoaDocGia
     @Ma_DocGia varchar(50)
 AS
 BEGIN
@@ -795,64 +834,120 @@ Bước thực hiện:
     [3.2] Nếu không còn thì thông báo cho độc giả chờ thêm một record vào bảng DangKy
 */
 
-CREATE PROC sp_MuonSach
-    @ISBN varchar(25),
+CREATE OR ALTER PROC sp_MuonSach
+    @ISBN      varchar(25),
     @Ma_DocGia varchar(50)
 AS
 BEGIN
-    -- Kiểm tra độc giả có đang mượn cuốn sách cùng loại không
+    -- [0] Kiểm tra độc giả tồn tại
+    IF NOT EXISTS (SELECT 1 FROM DocGia WHERE Ma_DocGia = @Ma_DocGia)
+    BEGIN
+        PRINT N'Lỗi: Không tìm thấy độc giả.';
+        RETURN;
+    END
+ 
+    -- [1] Kiểm tra độc giả có đang mượn cuốn sách cùng ISBN không
     IF EXISTS (SELECT 1 FROM Muon WHERE ISBN = @ISBN AND Ma_DocGia = @Ma_DocGia)
     BEGIN
         PRINT N'Lỗi: Độc giả đang mượn một cuốn sách cùng loại (ISBN).';
         RETURN;
     END
-
-    -- Kiểm tra số lượng sách đang mượn
+ 
+    -- [2] Kiểm tra hạn mức mượn sách
     DECLARE @SoSachDangMuon int;
+ 
     IF EXISTS (SELECT 1 FROM NguoiLon WHERE Ma_DocGia = @Ma_DocGia)
     BEGIN
-        SELECT @SoSachDangMuon = COUNT(*) FROM Muon 
-        WHERE Ma_DocGia = @Ma_DocGia OR Ma_DocGia IN (SELECT Ma_DocGia FROM TreEm WHERE Ma_DocGia_NguoiLon = @Ma_DocGia);
-        
+        -- SỬA LỖI 3: Kiểm tra HanSuDung (QĐ-6)
+        IF EXISTS (SELECT 1 FROM NguoiLon WHERE Ma_DocGia = @Ma_DocGia AND HanSuDung < CAST(GETDATE() AS date))
+        BEGIN
+            PRINT N'Lỗi QĐ-6: Thẻ độc giả đã hết hạn sử dụng, không thể mượn sách.';
+            RETURN;
+        END
+ 
+        -- Người lớn: tổng sách của người lớn + tất cả trẻ em được bảo lãnh
+        SELECT @SoSachDangMuon = COUNT(*)
+        FROM Muon
+        WHERE Ma_DocGia = @Ma_DocGia
+           OR Ma_DocGia IN (SELECT Ma_DocGia FROM TreEm WHERE Ma_DocGia_NguoiLon = @Ma_DocGia);
+ 
         IF @SoSachDangMuon >= 5
         BEGIN
-            PRINT N'Lỗi: Vượt quá số lượng sách tối đa (5 cuốn).';
+            PRINT N'Lỗi QĐ-4: Vượt quá số lượng sách tối đa cho phép (5 cuốn).';
             RETURN;
         END
     END
-    ELSE
+    ELSE IF EXISTS (SELECT 1 FROM TreEm WHERE Ma_DocGia = @Ma_DocGia)
     BEGIN
+        -- Trẻ em: kiểm tra giới hạn bản thân (tối đa 1 cuốn)
         SELECT @SoSachDangMuon = COUNT(*) FROM Muon WHERE Ma_DocGia = @Ma_DocGia;
         IF @SoSachDangMuon >= 1
         BEGIN
-            PRINT N'Lỗi: Trẻ em chỉ được mượn tối đa 1 cuốn.';
+            PRINT N'Lỗi QĐ-5: Trẻ em chỉ được mượn tối đa 1 cuốn.';
+            RETURN;
+        END
+ 
+        -- SỬA LỖI 1: Kiểm tra tổng hạn mức của người lớn bảo lãnh
+        DECLARE @Ma_NguoiLon varchar(50);
+        SELECT @Ma_NguoiLon = Ma_DocGia_NguoiLon FROM TreEm WHERE Ma_DocGia = @Ma_DocGia;
+ 
+        DECLARE @TongSachNguoiLon int;
+        SELECT @TongSachNguoiLon = COUNT(*)
+        FROM Muon
+        WHERE Ma_DocGia = @Ma_NguoiLon
+           OR Ma_DocGia IN (SELECT Ma_DocGia FROM TreEm WHERE Ma_DocGia_NguoiLon = @Ma_NguoiLon);
+ 
+        IF @TongSachNguoiLon >= 5
+        BEGIN
+            PRINT N'Lỗi QĐ-4: Tổng số sách của người lớn bảo lãnh và các trẻ em đã đạt tối đa (5 cuốn).';
             RETURN;
         END
     END
-
-    -- Kiểm tra có còn sách trong thư viện không
-    DECLARE @Ma_CuonSach varchar(50);
-    
-    -- Tìm cuốn sách có ISBN này mà hiện tại không có trong bảng Muon
-    SELECT TOP 1 @Ma_CuonSach = cs.Ma_CuonSach 
+    ELSE
+    BEGIN
+        PRINT N'Lỗi: Độc giả không thuộc loại Người Lớn hay Trẻ Em.';
+        RETURN;
+    END
+ 
+    -- [3] Kiểm tra có còn sách trong thư viện không
+    -- SỬA LỖI 4: Khởi tạo NULL tường minh trước SELECT TOP 1
+    DECLARE @Ma_CuonSach varchar(50) = NULL;
+ 
+    SELECT TOP 1 @Ma_CuonSach = cs.Ma_CuonSach
     FROM CuonSach cs
-    WHERE cs.ISBN = @ISBN 
+    WHERE cs.ISBN = @ISBN
       AND cs.Ma_CuonSach NOT IN (SELECT Ma_CuonSach FROM Muon WHERE ISBN = @ISBN);
-
-    -- Thực hiện mượn hoặc đăng ký
+ 
     IF @Ma_CuonSach IS NOT NULL
     BEGIN
+        -- Còn sách: thực hiện mượn
         BEGIN TRAN
+        BEGIN TRY
             INSERT INTO Muon (ISBN, Ma_CuonSach, Ma_DocGia, NgayMuon, NgayHetHan)
             VALUES (@ISBN, @Ma_CuonSach, @Ma_DocGia, GETDATE(), DATEADD(day, 14, GETDATE()));
+ 
             EXEC sp_CapnhatTrangthaiDausach @ISBN;
-        COMMIT TRAN
-        PRINT N'Mượn sách thành công! Mã cuốn sách mượn được là: ' + @Ma_CuonSach;
+            COMMIT TRAN;
+            PRINT N'Mượn sách thành công! Mã cuốn sách: ' + @Ma_CuonSach;
+        END TRY
+        BEGIN CATCH
+            ROLLBACK TRAN;
+            PRINT N'Lỗi khi mượn sách: ' + ERROR_MESSAGE();
+        END CATCH
     END
     ELSE
     BEGIN
-        INSERT INTO DangKy (ISBN, Ma_DocGia, NgayDK) VALUES (@ISBN, @Ma_DocGia, GETDATE());
-        PRINT N'Sách trong kho đã được mượn hết. Đã chuyển sang danh sách Đăng ký.';
+        -- Hết sách: đăng ký chờ
+        -- SỬA LỖI 2: Kiểm tra trùng trước khi INSERT DangKy
+        IF EXISTS (SELECT 1 FROM DangKy WHERE ISBN = @ISBN AND Ma_DocGia = @Ma_DocGia)
+        BEGIN
+            PRINT N'Thông báo: Sách đã hết. Độc giả đã có trong danh sách đăng ký chờ rồi.';
+            RETURN;
+        END
+ 
+        INSERT INTO DangKy (ISBN, Ma_DocGia, NgayDK, GhiChu)
+        VALUES (@ISBN, @Ma_DocGia, GETDATE(), N'Đăng ký chờ sách');
+        PRINT N'Sách đã được mượn hết. Đã đăng ký vào danh sách chờ thành công.';
     END
 END
 
@@ -874,41 +969,65 @@ Bước thưc hiện:
 */
 
 CREATE OR ALTER PROC sp_TraSach
-    @ISBN varchar(25),
+    @ISBN        varchar(25),
     @Ma_CuonSach varchar(50),
-    @Ma_DocGia varchar(50)
+    @Ma_DocGia   varchar(50),
+    @TienMuon    decimal(10,2) = 5.00,   -- SỬA LỖI 1: nhận từ tham số (mặc định 5.00)
+    @TienDatCoc  decimal(10,2) = 50.00   -- SỬA LỖI 1: nhận từ tham số (mặc định 50.00)
 AS
 BEGIN
-    DECLARE @NgayMuon datetime, @NgayHetHan datetime, @TienPhat decimal(5,2) = 0;
-    
-    SELECT @NgayMuon = NgayMuon, @NgayHetHan = NgayHetHan 
-    FROM Muon WHERE ISBN = @ISBN AND Ma_CuonSach = @Ma_CuonSach AND Ma_DocGia = @Ma_DocGia;
-
+    DECLARE @NgayMuon   datetime;
+    DECLARE @NgayHetHan datetime;
+    DECLARE @TienPhat   decimal(10,2) = 0;  -- SỬA LỖI 2: decimal(10,2)
+ 
+    SELECT @NgayMuon = NgayMuon, @NgayHetHan = NgayHetHan
+    FROM Muon
+    WHERE ISBN = @ISBN AND Ma_CuonSach = @Ma_CuonSach AND Ma_DocGia = @Ma_DocGia;
+ 
     IF @NgayMuon IS NULL
     BEGIN
-        PRINT N'Không tìm thấy thông tin mượn!'; 
+        PRINT N'Không tìm thấy thông tin mượn (kiểm tra lại ISBN, Mã cuốn sách, Mã độc giả)!';
         RETURN;
     END
-
-    -- Tính phạt nếu trễ (Giả sử 1$/ngày)
+ 
+    -- Tính tiền phạt trễ hạn (1$/ngày)
     IF GETDATE() > @NgayHetHan
         SET @TienPhat = DATEDIFF(day, @NgayHetHan, GETDATE()) * 1.00;
-
+ 
     BEGIN TRAN
     BEGIN TRY
-        INSERT INTO QuaTrinhMuon (ISBN, Ma_CuonSach, NgayMuon, Ma_DocGia, NgayHetHan, NgayTra, TienMuon, TienDaTra, TienDatCoc)
-        VALUES (@ISBN, @Ma_CuonSach, @NgayMuon, @Ma_DocGia, @NgayHetHan, GETDATE(), 5.00, 5.00 + @TienPhat, 50.00);
-
+        INSERT INTO QuaTrinhMuon
+            (ISBN, Ma_CuonSach, NgayMuon, Ma_DocGia, NgayHetHan, NgayTra,
+             TienMuon, TienDaTra, TienDatCoc, GhiChu)
+        VALUES
+            (@ISBN, @Ma_CuonSach, @NgayMuon, @Ma_DocGia, @NgayHetHan, GETDATE(),
+             @TienMuon,                          -- SỬA: dùng tham số
+             @TienMuon + @TienPhat,              -- TienDaTra = phí mượn + phạt
+             @TienDatCoc,                        -- SỬA: dùng tham số
+             CASE WHEN @TienPhat > 0
+                  THEN N'Trả trễ ' + CAST(DATEDIFF(day, @NgayHetHan, GETDATE()) AS varchar) + N' ngày, phạt $' + CAST(@TienPhat AS varchar)
+                  ELSE N'Trả đúng hạn'
+             END);
+ 
         DELETE FROM Muon WHERE ISBN = @ISBN AND Ma_CuonSach = @Ma_CuonSach AND Ma_DocGia = @Ma_DocGia;
-        
-        COMMIT TRAN
-        PRINT N'Trả sách thành công. Tiền phạt: ' + CAST(@TienPhat AS varchar(10));
+ 
+        EXEC sp_CapnhatTrangthaiDausach @ISBN;
+ 
+        COMMIT TRAN;
+        PRINT N'Trả sách thành công. Tiền phạt: $' + CAST(@TienPhat AS varchar(20));
     END TRY
     BEGIN CATCH
-        ROLLBACK TRAN
-        PRINT N'Lỗi quá trình trả sách!';
+        ROLLBACK TRAN;
+        PRINT N'Lỗi quá trình trả sách: ' + ERROR_MESSAGE();
     END CATCH
 END
+
+EXEC sp_TraSach
+    @ISBN        = '978-604-4',
+    @Ma_CuonSach = 'CS004',
+    @Ma_DocGia   = 'DG003',
+    @TienMuon    = 5.00,
+    @TienDatCoc  = 50.00;
 
 
 /*
@@ -937,6 +1056,8 @@ Gợi ý: Sử dụng cursor để duyệt qua các tựa sách được sửa t
 */
 
 -- a. tg_delMuon: Cập nhật tình trạng cuốn sách là 'yes' khi trả (xóa dòng ở Muon)
+IF OBJECT_ID('tg_delMuon', 'TR') IS NOT NULL 
+    DROP TRIGGER tg_delMuon
 CREATE OR ALTER TRIGGER tg_delMuon
 ON Muon
 AFTER DELETE
