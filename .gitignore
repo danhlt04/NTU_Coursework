@@ -105,17 +105,8 @@ coverage/
 *.bin
 *.dev
 *.win
-*.key
-*.pem
-*.crt
-*.p12
-*.pfx
-id_rsa*
-id_dsa*
 
 # ===== SECURITY =====
-.env
-.env.*
 appsettings.json
 appsettings.*.json
 secrets.json
@@ -125,6 +116,7 @@ secrets.json
 *.p12
 *.pfx
 id_rsa*
+id_dsa*       
 
 # .NET User Secrets (local dev)
 **/Properties/launchSettings.json
