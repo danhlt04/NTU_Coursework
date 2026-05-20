@@ -114,7 +114,28 @@ id_rsa*
 id_dsa*
 
 # ===== SECURITY =====
+.env
+.env.*
 appsettings.json
 appsettings.*.json
-config.json
 secrets.json
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+id_rsa*
+
+# .NET User Secrets (local dev)
+**/Properties/launchSettings.json
+
+# Credentials & tokens
+.npmrc          
+.netrc         
+*.credentials
+
+# Docker
+docker-compose.override.yml
+
+# Database local
+*.mdb
