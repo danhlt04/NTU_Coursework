@@ -8,7 +8,7 @@ namespace Bai3
         {
             InitializeComponent();
             ptrbx1.SizeMode = PictureBoxSizeMode.Zoom;
-            ptrbx1.Image = Image.FromFile(@"D:\University\Sem4_2025_2026\laptrinhhuongdoituong\Lab5\Bai3\images\aurora.jpg");
+            ptrbx1.Image = Image.FromFile(@".\images\aurora.jpg");
         }
 
         private void btn2_Click(object sender, EventArgs e)
@@ -18,7 +18,7 @@ namespace Bai3
 
         private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            openFileDialog1.InitialDirectory = @"D:\University\Sem4_2025_2026\laptrinhhuongdoituong\Lab5\Bai3\images";
+            openFileDialog1.InitialDirectory = @".\images";
         }
 
         private void btn1_Click(object sender, EventArgs e)
