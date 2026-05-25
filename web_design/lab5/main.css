@@ -1,0 +1,78 @@
+.navbar-nav .nav-item .nav-link {
+    color: black !important;
+    text-transform: uppercase !important;
+}
+.navbar-nav .nav-item .nav-link.active,
+.navbar-nav .nav-item .nav-link:hover {
+    color: red !important;
+}
+
+.box-product {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.box-product .card-body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: transparent;
+    transition: opacity 0.2s;
+}
+.box-product .card-title,
+.box-product .card-text {
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.box-product:hover .card-body {
+    opacity: 0;
+}
+
+.box-btn {
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    background: rgba(0,0,0,0.3);
+}
+.box-product:hover .box-btn {
+    visibility: visible;
+}
+
+.box-btn button {
+    width: 150px;
+    height: 50px;
+    border-radius: 25px;
+}
+
+footer {
+    background-color: #0d2b45;
+}
+footer a:hover {
+    color: #484a51 !important;
+}
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.15);
+    color: white !important;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background 0.2s;
+}
+.social-icon:hover {
+    background-color: #233fcb;
+}
