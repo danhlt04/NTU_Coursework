@@ -1,0 +1,82 @@
+﻿@page
+@model AttendanceDashboard.Pages.IndexModel
+@{
+    ViewData["Title"] = "Tổng quan";
+    ViewData["Page"] = "Index";
+}
+
+<h4 class="mb-4 fw-bold">Tổng quan hôm nay</h4>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-color:#0d6efd;">
+            <div class="text-muted small">Tổng sinh viên</div>
+            <div class="fs-2 fw-bold text-primary">@Model.TotalStudents</div>
+            <i class="bi bi-people text-primary"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-color:#198754;">
+            <div class="text-muted small">Điểm danh hôm nay</div>
+            <div class="fs-2 fw-bold text-success">@Model.TodayCount</div>
+            <i class="bi bi-check-circle text-success"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-color:#dc3545;">
+            <div class="text-muted small">Vắng mặt</div>
+            <div class="fs-2 fw-bold text-danger">@Model.AbsentCount</div>
+            <i class="bi bi-x-circle text-danger"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card p-3" style="border-color:#ffc107;">
+            <div class="text-muted small">Tỉ lệ điểm danh</div>
+            <div class="fs-2 fw-bold text-warning">@Model.AttendanceRate%</div>
+            <i class="bi bi-bar-chart text-warning"></i>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3">
+    <h6 class="fw-bold mb-3">
+        <i class="bi bi-calendar-check me-2 text-success"></i>
+        Điểm danh hôm nay — @DateTime.Today.ToString("dd/MM/yyyy")
+    </h6>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Mã SV</th>
+                    <th>UID</th>
+                    <th>Họ tên</th>
+                    <th>Lớp</th>
+                    <th>Giờ vào</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.TodayRecords.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            Chưa có điểm danh hôm nay
+                        </td>
+                    </tr>
+                }
+                @for (int i = 0; i < Model.TodayRecords.Count; i++)
+                {
+                    var r = Model.TodayRecords[i];
+                    <tr>
+                        <td>@(i + 1)</td>
+                        <td><span class="badge bg-primary">@r.StudentCode</span></td>
+                        <td><span class="badge bg-secondary">@r.UID</span></td>
+                        <td>@r.FullName</td>
+                        <td>@r.ClassName</td>
+                        <td>@r.CheckInTime.ToString("HH:mm:ss")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

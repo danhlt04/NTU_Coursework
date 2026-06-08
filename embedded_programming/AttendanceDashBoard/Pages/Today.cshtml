@@ -1,0 +1,58 @@
+@page
+@model AttendanceDashboard.Pages.TodayModel
+@{
+    ViewData["Title"] = "Hôm nay";
+    ViewData["Page"] = "Today";
+}
+
+<h4 class="fw-bold mb-4">
+    Điểm danh hôm nay —
+    <span class="text-primary">@DateTime.Today.ToString("dd/MM/yyyy")</span>
+</h4>
+
+<div class="card p-3">
+    <div class="d-flex justify-content-between mb-3">
+        <span class="text-muted">Tổng cộng: <strong>@Model.Records.Count</strong> sinh viên</span>
+        <a href="/Today" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-clockwise me-1"></i> Làm mới
+        </a>
+    </div>
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Mã SV</th>
+                <th>UID</th>
+                <th>Họ tên</th>
+                <th>Lớp</th>
+                <th>Giờ vào</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Records.Count == 0)
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                        Chưa có điểm danh hôm nay
+                    </td>
+                </tr>
+            }
+            @for (int i = 0; i < Model.Records.Count; i++)
+            {
+                var r = Model.Records[i];
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td><span class="badge bg-primary">@r.StudentCode</span></td>
+                    <td><span class="badge bg-secondary">@r.UID</span></td>
+                    <td>@r.FullName</td>
+                    <td>@r.ClassName</td>
+                    <td>
+                        <span class="badge bg-success">
+                            @r.CheckInTime.ToString("HH:mm:ss")
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

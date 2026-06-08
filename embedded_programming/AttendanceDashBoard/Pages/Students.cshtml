@@ -1,0 +1,117 @@
+@page
+@model AttendanceDashboard.Pages.StudentsModel
+@{
+    ViewData["Title"] = "Sinh viên";
+    ViewData["Page"] = "Students";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Quản lý sinh viên</h4>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+        <i class="bi bi-plus-lg me-1"></i> Thêm sinh viên
+    </button>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-@Model.MessageType alert-dismissible fade show">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card p-3">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>UID</th>
+                <th>Họ tên</th>
+                <th>Lớp</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Students.Count; i++)
+            {
+                var s = Model.Students[i];
+                <tr>
+                    <td>@(i + 1)</td>
+                    <td><span class="badge bg-secondary">@s.UID</span></td>
+                    <td>@s.FullName</td>
+                    <td>@s.ClassName</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="confirmDelete('@s.UID', '@s.FullName')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal thêm sinh viên -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm sinh viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="Add">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">UID thẻ</label>
+                        <input name="uid" class="form-control" placeholder="VD: A4B3C2D1" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Họ tên</label>
+                        <input name="fullName" class="form-control" placeholder="Nguyen Van A" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lớp</label>
+                        <input name="className" class="form-control" placeholder="CNTT1" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xoá -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Xác nhận xoá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc muốn xoá sinh viên <strong id="deleteName"></strong>?
+            </div>
+            <form method="post" asp-page-handler="Delete">
+                <input type="hidden" name="uid" id="deleteUID" />
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                    <button type="submit" class="btn btn-danger">Xoá</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function confirmDelete(uid, name) {
+    document.getElementById('deleteUID').value = uid;
+    document.getElementById('deleteName').textContent = name;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+}

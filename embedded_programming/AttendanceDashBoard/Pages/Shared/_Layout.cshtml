@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Hệ thống điểm danh</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: #1e3a5f;
+        }
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin: 2px 8px;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link i {
+            width: 20px;
+        }
+        .main-content {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .stat-card {
+            border-left: 4px solid;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column p-3" style="width:240px; min-width:240px;">
+        <div class="text-white text-center py-3 mb-3">
+            <i class="bi bi-person-badge fs-2"></i>
+            <div class="fw-bold mt-1">Hệ thống quản lí</div>
+            <h5 class="text-success">Điểm danh</h5>
+        </div>
+        <hr class="text-secondary" />
+        <nav class="nav flex-column gap-1">
+            <a class="nav-link @(ViewData["Page"]?.ToString() == "Index" ? "active" : "")"
+               href="/">
+                <i class="bi bi-speedometer2 me-2"></i> Tổng quan
+            </a>
+            <a class="nav-link @(ViewData["Page"]?.ToString() == "Today" ? "active" : "")"
+               href="/Today">
+                <i class="bi bi-calendar-check me-2"></i> Hôm nay
+            </a>
+            <a class="nav-link @(ViewData["Page"]?.ToString() == "History" ? "active" : "")"
+               href="/History">
+                <i class="bi bi-clock-history me-2"></i> Lịch sử
+            </a>
+            <a class="nav-link @(ViewData["Page"]?.ToString() == "Students" ? "active" : "")"
+               href="/Students">
+                <i class="bi bi-people me-2"></i> Sinh viên
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main -->
+    <div class="main-content flex-grow-1 p-4">
+        @RenderBody()
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@RenderSection("Scripts", required: false)
+</body>
+</html>
