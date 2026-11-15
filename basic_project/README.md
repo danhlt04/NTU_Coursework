@@ -1,1 +1,1 @@
-# Mã nguồn đồ án cơ sỏ ngành
+# Mã nguồn đồ án cơ sở ngành
