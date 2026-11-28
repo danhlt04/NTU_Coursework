@@ -1,0 +1,47 @@
+@model IEnumerable<WebQLBH.Models.LoaiSanPham>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Loại sản phẩm</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MaLSP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TenLSP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NhomSP.TenNSP)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.MaLSP)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.TenLSP)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.NhomSP.TenNSP)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { malsp = @item.MaLSP }) |
+                @Html.ActionLink("Details", "Details", new { malsp = @item.MaLSP }) |
+                @Html.ActionLink("Delete", "Delete", new { malsp = @item.MaLSP }) 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

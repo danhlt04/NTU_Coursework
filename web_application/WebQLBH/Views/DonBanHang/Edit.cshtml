@@ -1,0 +1,56 @@
+@model WebQLBH.Models.DonBanHang
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>DonBanHang</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="MaDBH" />
+            <div class="form-group">
+                <label asp-for="NgayDat" class="control-label"></label>
+                <input asp-for="NgayDat" class="form-control" />
+                <span asp-validation-for="NgayDat" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NgayGiao" class="control-label"></label>
+                <input asp-for="NgayGiao" class="form-control" />
+                <span asp-validation-for="NgayGiao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DCGH" class="control-label"></label>
+                <input asp-for="DCGH" class="form-control" />
+                <span asp-validation-for="DCGH" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Xa phuong</label>
+                <select adp-for="MaXP" asp-items="ViewBag.XaPhuongs"></select>
+            </div>
+            <div class="form-group">
+                <label>Nhan vien</label>
+                <select asp-for="MaNV" asp-items="ViewBag.NhanViens"></select>
+            </div>
+            <div class="form-group">
+                <label>Khach hang</label>
+                <select asp-for="MaKH" asp-items="ViewBag.KhachHangs"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

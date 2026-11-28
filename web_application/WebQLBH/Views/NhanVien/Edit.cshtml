@@ -1,0 +1,74 @@
+@model WebQLBH.Models.NhanVien
+@using System.Collections.Generic
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>NhanVien</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @* Bổ sung thẻ enctype để thao tác ảnh *@
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="MaNV" />
+            <div class="form-group">
+                <label asp-for="HoNV" class="control-label"></label>
+                <input asp-for="HoNV" class="form-control" />
+                <span asp-validation-for="HoNV" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TenNV" class="control-label"></label>
+                <input asp-for="TenNV" class="form-control" />
+                <span asp-validation-for="TenNV" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DienThoai" class="control-label"></label>
+                <input asp-for="DienThoai" class="form-control" />
+                <span asp-validation-for="DienThoai" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TenDN" class="control-label"></label>
+                <input asp-for="TenDN" class="form-control" />
+                <span asp-validation-for="TenDN" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <p>
+                    Ảnh hiện tại:
+                    @if (!string.IsNullOrEmpty(Model.AnhNV))
+                    {
+                        <img src="~/images/uploads/@Model.AnhNV" width="80" />
+                    }
+                </p>
+                <input type="hidden" name="existingAnh" value="@Model.AnhNV" />
+                <label>Chọn ảnh mới (nếu muốn)</label>
+                <input type="file" name="image" />
+            </div>
+            <div class="form-group">
+                <label>Thuộc phòng ban</label>
+                <select asp-for="MaPB" asp-items="ViewBag.PhongBans"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,65 @@
+@model IEnumerable<WebQLBH.Models.NhaCungCap>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TenNCC)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DienThoai)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiaChi)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.XaPhuong.TenXP)
+            </th>
+            @* <th>
+                @Html.DisplayNameFor(model => model.XaPhuong.TenXP)
+            </th> *@
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.TenNCC)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.DienThoai)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.DiaChi)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.XaPhuong.TenXP)
+            </td>
+            @* <td>
+                @Html.DisplayFor(model => item.XaPhuong.TenXP)
+            </td> *@
+            <td>
+                @Html.ActionLink("Sửa", "Edit", new {mancc = @item.MaNCC}) |
+                @Html.ActionLink("Chi tiết", "Details", new { mancc = @item.MaNCC }) |
+                @Html.ActionLink("Xóa", "Delete", new { mancc = @item.MaNCC })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,41 @@
+@model IEnumerable<WebQLBH.Models.PhongBan>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MaPB)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TenPB)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.MaPB)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.TenPB)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { mapb = item.MaPB }) |
+                @Html.ActionLink("Details", "Details", new { mapb = item.MaPB }) |
+                @Html.ActionLink("Delete", "Delete", new { mapb = item.MaPB })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

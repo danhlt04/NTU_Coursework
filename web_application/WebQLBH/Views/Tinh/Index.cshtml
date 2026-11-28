@@ -1,0 +1,41 @@
+@model IEnumerable<WebQLBH.Models.Tinh>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MaTinh)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TenTinh)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.MaTinh)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.TenTinh)
+            </td>
+            <td>
+                @Html.ActionLink("Sửa", "Edit", new { matinh = @item.MaTinh })|
+                @Html.ActionLink("Chi tiết", "Details", new { matinh = @item.MaTinh })|
+                @Html.ActionLink("Xóa", "Delete", new { matinh = @item.MaTinh })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

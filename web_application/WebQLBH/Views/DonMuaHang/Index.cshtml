@@ -1,0 +1,53 @@
+@model IEnumerable<WebQLBH.Models.DonMuaHang>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NgayDat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NgayGiao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NhanVien.TenNV)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NhaCungCap.TenNCC)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.NgayDat)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.NgayGiao)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.NhanVien.TenNV)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.NhaCungCap.TenNCC)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { madmh = @item.MaDMH }) |
+                @Html.ActionLink("Details", "Details", new { madmh = @item.MaDMH }) |
+                @Html.ActionLink("Delete", "Delete", new { madmh = @item.MaDMH })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

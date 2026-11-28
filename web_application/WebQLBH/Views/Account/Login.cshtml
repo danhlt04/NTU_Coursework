@@ -1,0 +1,38 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Đăng nhập";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">Đăng nhập hệ thống</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label for="TenDN" class="form-label fw-semibold">Tên đăng nhập</label>
+                        <input type="text" class="form-control" id="TenDN" name="TenDN" placeholder="Nhập tên đăng nhập" required autofocus />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="MatKhau" class="form-label fw-semibold">Mật khẩu</label>
+                        <input type="password" class="form-control" id="MatKhau" name="MatKhau" placeholder="Nhập mật khẩu" required />
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

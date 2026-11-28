@@ -1,0 +1,81 @@
+@model IEnumerable<WebQLBH.Models.SanPham>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Sản phẩm</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MaSP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TenSP) 
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DonGia) 
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AnhSP) 
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MoTaTT) 
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ThongTinCT) 
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LSP.TenLSP) 
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DVT.TenDVT) 
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.MaSP)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.TenSP)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.DonGia)
+            </td>
+            <td>
+                @* @Html.DisplayFor(model => item.AnhSP) *@
+                @if (!string.IsNullOrEmpty(item.AnhSP))
+                    {
+                        <img src="~/images/uploads/@item.AnhSP" alt="" width="80" />
+                    }
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.MoTaTT)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.ThongTinCT)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.LSP.TenLSP)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.DVT.TenDVT)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { masp = @item.MaSP}) |
+                @Html.ActionLink("Details", "Details", new { masp = @item.MaSP}) |
+                @Html.ActionLink("Delete", "Delete", new { masp = @item.MaSP }) 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

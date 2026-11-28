@@ -1,0 +1,66 @@
+@model IEnumerable<WebQLBH.Models.DonBanHang>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NgayDat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NgayGiao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DCGH)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.XaPhuong.TenXP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NhanVien.TenNV)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.KhachHang.TenKH)
+            </th>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.NgayDat)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.NgayGiao)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.DCGH)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.XaPhuong.TenXP)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.NhanVien.TenNV)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.KhachHang.TenKH)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { madbh = @item.MaDBH }) |
+                @Html.ActionLink("Details", "Details", new { madbh = @item.MaDBH }) |
+                @Html.ActionLink("Delete", "Delete", new { madbh = @item.MaDBH })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

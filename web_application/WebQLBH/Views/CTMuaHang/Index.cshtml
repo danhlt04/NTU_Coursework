@@ -1,0 +1,53 @@
+@model IEnumerable<WebQLBH.Models.CTMuaHang>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DonMuaHang.MaDMH)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SanPham.TenSP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SLM)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DGM)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.DonMuaHang.MaDMH)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.SanPham.TenSP)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.SLM)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.DGM)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { madmh = @item.MaDMH, masp = @item.MaSP }) |
+                @Html.ActionLink("Details", "Details", new { madmh = @item.MaDMH, masp = @item.MaSP }) |
+                @Html.ActionLink("Delete", "Delete", new { madmh = @item.MaDMH, masp = @item.MaSP })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

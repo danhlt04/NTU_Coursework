@@ -1,0 +1,51 @@
+@model WebQLBH.Models.CTMuaHang
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>CTMuaHang</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label>Đơn mua hàng</label>
+                <select asp-for="MaDMH" asp-items="ViewBag.DonMuaHangs">
+                    <option value="">-- Chọn đơn mua hàng --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Sản phẩm</label>
+                <select asp-for="MaSP" asp-items="ViewBag.SanPhams">
+                    <option value="">-- Chọn sản phẩm --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SLM" class="control-label"></label>
+                <input asp-for="SLM" class="form-control" />
+                <span asp-validation-for="SLM" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DGM" class="control-label"></label>
+                <input asp-for="DGM" class="form-control" />
+                <span asp-validation-for="DGM" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

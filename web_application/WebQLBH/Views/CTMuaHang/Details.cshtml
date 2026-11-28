@@ -1,0 +1,52 @@
+@model WebQLBH.Models.CTMuaHang
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>CTMuaHang</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DonMuaHang.MaDMH)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DonMuaHang.MaDMH)
+        </dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SanPham.TenSP)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SanPham.TenSP)
+        </dd>
+    </dl>
+    <dl>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SLM)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SLM)
+        </dd>
+    </dl>
+    <dl>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DGM)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DGM)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" 
+    asp-route-madmh="@Model?.MaDMH"
+    asp-route-masp="@Model?.MaSP">
+        Edit
+    </a> |
+    <a asp-action="Index">Back to List</a>
+</div>
